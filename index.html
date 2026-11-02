@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mallikatselmus – märkätilat</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1f4e5f">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{
+  --bg:#f3f1ec; --card:#fff; --ink:#1d2329; --muted:#5f6b75; --line:#dcd8cf;
+  --brand:#1f4e5f; --brand2:#2d6f86;
+  --ok:#1f7a45; --ok-bg:#e3f3e8;
+  --huom:#a8640a; --huom-bg:#fcefd9;
+  --puute:#b3261e; --puute-bg:#fbe3e1;
+  --ek:#6b7480; --ek-bg:#eceef0;
+  --param:#1f4e5f; --param-bg:#e2eef2; --miss-bg:#fde8c8;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-text-size-adjust:100%}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+.wrap{max-width:760px;margin:0 auto;padding:0 12px 120px}
+header.top{position:sticky;top:0;z-index:20;background:var(--brand);color:#fff;box-shadow:0 2px 6px rgba(0,0,0,.15)}
+header.top .row{max-width:760px;margin:0 auto;display:flex;align-items:center;gap:10px;padding:10px 12px}
+header.top h1{font-size:17px;margin:0;flex:1;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+header.top small{display:block;font-weight:400;opacity:.8;font-size:12px}
+.iconbtn{background:rgba(255,255,255,.15);border:0;color:#fff;border-radius:8px;padding:7px 10px;font-size:14px}
+.prog{height:5px;background:rgba(255,255,255,.2)}
+.prog i{display:block;height:100%;background:#8fd3a8;width:0;transition:width .3s}
+nav.tabs{display:flex;max-width:760px;margin:0 auto}
+nav.tabs button{flex:1;background:none;border:0;color:#d5e6ec;padding:9px 4px 10px;font-size:14px;font-weight:600;border-bottom:3px solid transparent}
+nav.tabs button.on{color:#fff;border-bottom-color:#fff}
+.sync{font-size:11px;opacity:.85}
+h2{font-size:15px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:22px 4px 8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin:10px 0}
+label.f{display:block;margin:0 0 12px}
+label.f span{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+label.f em{display:block;font-size:12px;color:var(--muted);font-style:normal;margin-top:3px}
+input[type=text],input[type=date],textarea{width:100%;border:1px solid #c9c4b8;border-radius:8px;padding:10px;background:#fff;font-size:16px}
+textarea{min-height:64px;resize:vertical}
+.btn{border:0;border-radius:10px;padding:12px 16px;font-weight:600;background:var(--brand);color:#fff}
+.btn.sec{background:#e4e9ec;color:var(--brand)}
+.btn.warn{background:var(--puute-bg);color:var(--puute)}
+.btn.block{display:block;width:100%;margin:8px 0}
+.muted{color:var(--muted);font-size:13px}
+/* sections */
+.sec-h{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 14px;margin:10px 0 0;width:100%;text-align:left}
+.sec-h .ltr{width:30px;height:30px;border-radius:50%;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex:none}
+.sec-h b{flex:1;font-size:16px}
+.sec-h .cnt{font-size:13px;color:var(--muted);white-space:nowrap}
+.sec-h .cnt.done{color:var(--ok);font-weight:600}
+.sec-h .chev{transition:transform .2s;color:var(--muted)}
+.sec.open .sec-h{border-radius:12px 12px 0 0;border-bottom:0}
+.sec.open .chev{transform:rotate(90deg)}
+.sec-body{display:none;border:1px solid var(--line);border-top:0;border-radius:0 0 12px 12px;background:#faf9f6;padding:4px 10px 12px}
+.sec.open .sec-body{display:block}
+.sec-desc{font-size:13px;color:var(--muted);margin:8px 4px 4px}
+.item{background:#fff;border:1px solid var(--line);border-left:5px solid var(--line);border-radius:10px;padding:12px;margin:10px 0}
+.item[data-s=ok]{border-left-color:var(--ok)}
+.item[data-s=huom]{border-left-color:var(--huom)}
+.item[data-s=puute]{border-left-color:var(--puute)}
+.item[data-s=ek]{border-left-color:var(--ek);opacity:.8}
+.item h3{font-size:16px;margin:0 0 4px;display:flex;gap:8px}
+.item h3 .no{color:var(--muted);font-weight:600;flex:none}
+.req{font-size:14.5px;margin:4px 0 6px}
+.pv{background:var(--param-bg);color:var(--param);border-radius:4px;padding:0 4px;font-weight:600}
+.pv.miss{background:var(--miss-bg);color:#8a4b00;font-weight:500;font-style:italic}
+details.how{margin:6px 0;font-size:14px}
+details.how summary{color:var(--brand2);font-weight:600;cursor:pointer;padding:4px 0;list-style:none}
+details.how summary::-webkit-details-marker{display:none}
+details.how summary:before{content:"ⓘ  "}
+details.how div{background:#f1f6f8;border-radius:8px;padding:8px 10px;margin-top:4px}
+.ref{font-size:12px;color:var(--muted);margin-top:4px}
+.st{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:10px 0 8px}
+.st button{border:2px solid var(--line);background:#fff;border-radius:10px;padding:11px 2px;font-weight:700;font-size:14px;min-height:46px}
+.st button[data-v=ok].on{background:var(--ok);border-color:var(--ok);color:#fff}
+.st button[data-v=huom].on{background:var(--huom);border-color:var(--huom);color:#fff}
+.st button[data-v=puute].on{background:var(--puute);border-color:var(--puute);color:#fff}
+.st button[data-v=ek].on{background:var(--ek);border-color:var(--ek);color:#fff}
+.st button[data-v=ok]{color:var(--ok)} .st button[data-v=huom]{color:var(--huom)} .st button[data-v=puute]{color:var(--puute)} .st button[data-v=ek]{color:var(--ek)}
+.st.dec{grid-template-columns:repeat(3,1fr)}
+.note{min-height:48px;font-size:15px}
+.ph{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;align-items:center}
+.ph label.add{display:inline-flex;align-items:center;gap:6px;border:2px dashed #b9c6cc;color:var(--brand);border-radius:10px;padding:9px 12px;font-weight:600;font-size:14px}
+.thumb{position:relative;width:72px;height:72px;border-radius:8px;overflow:hidden;background:#ddd}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb button{position:absolute;top:2px;right:2px;width:24px;height:24px;border-radius:50%;border:0;background:rgba(0,0,0,.6);color:#fff;font-size:14px;line-height:24px;padding:0}
+.del-item{background:none;border:0;color:var(--puute);font-size:13px;padding:6px 0;margin-top:4px}
+.addform{background:#fff;border:1px dashed #b9c6cc;border-radius:10px;padding:12px;margin-top:10px}
+.pg{font-size:13px;font-weight:700;color:var(--brand);margin:16px 0 8px;text-transform:uppercase;letter-spacing:.03em}
+/* list */
+.insp{display:flex;gap:10px;align-items:center}
+.insp .meta{flex:1;min-width:0}
+.insp .meta b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pill{display:inline-block;font-size:12px;border-radius:20px;padding:1px 8px;margin-right:4px;font-weight:600}
+.pill.ok{background:var(--ok-bg);color:var(--ok)} .pill.huom{background:var(--huom-bg);color:var(--huom)} .pill.puute{background:var(--puute-bg);color:var(--puute)} .pill.ek{background:var(--ek-bg);color:var(--ek)}
+.sumrow{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0}
+.open-list li{margin:6px 0}
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:50;display:none;align-items:flex-end;justify-content:center}
+.modal.on{display:flex}
+.modal .box{background:#fff;border-radius:16px 16px 0 0;padding:18px;width:100%;max-width:560px;max-height:90vh;overflow:auto}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#1d2329;color:#fff;padding:10px 16px;border-radius:10px;font-size:14px;z-index:60;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90vw}
+.toast.on{opacity:1}
+.bigimg{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:70;display:none;align-items:center;justify-content:center}
+.bigimg.on{display:flex}
+.bigimg img{max-width:100%;max-height:100%}
+/* aineisto */
+.big-add{display:flex!important;justify-content:center;padding:16px!important;font-size:16px!important;margin:8px 0}
+/* tiedostovalitsin: näkymätön input painikkeen päällä -> napautus osuu suoraan inputtiin (Android WebView) */
+label.add{position:relative;overflow:hidden}
+label.add input[type=file]{position:absolute;inset:0;width:100%;height:100%;opacity:0;font-size:200px;cursor:pointer;z-index:2}
+.ph .add{min-height:46px}
+.phbusy{font-size:13px;color:var(--brand)}
+label.filebtn{position:relative;overflow:hidden;text-align:center;cursor:pointer}
+label.filebtn input[type=file]{position:absolute;inset:0;width:100%;height:100%;opacity:0;font-size:200px;cursor:pointer}
+.wvnote{background:var(--huom-bg);color:#6b4100;border-radius:10px;padding:10px 12px;margin-top:8px;font-size:13.5px;word-break:break-all}
+button.add{background:#fff;font:inherit;font-weight:600;font-size:14px;cursor:pointer}
+details.phalt{margin-top:6px;font-size:13px;color:var(--muted)}
+details.phalt summary{cursor:pointer;padding:4px 0}
+input.native{display:block;margin-top:6px;font-size:15px;width:100%;padding:8px;border:1px solid #c9c4b8;border-radius:8px;background:#fff}
+.diag{font:12px/1.4 ui-monospace,Menlo,monospace;background:#1d2329;color:#cfe;padding:8px;border-radius:8px;max-height:180px;overflow:auto;white-space:pre-wrap;margin-top:8px}
+label.add{display:inline-flex;align-items:center;gap:6px;border:2px dashed #b9c6cc;color:var(--brand);border-radius:10px;padding:9px 12px;font-weight:600;font-size:14px}
+.frow{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #eee;font-size:14px;word-break:break-word}
+.xbtn{background:#eef1f3;border:0;border-radius:50%;width:30px;height:30px;font-size:18px;line-height:30px;padding:0;flex:none;color:var(--muted)}
+.runbox{display:flex;gap:12px;align-items:center;background:#eef5f7;border-radius:10px;padding:12px;margin:10px 0}
+.spin{width:26px;height:26px;border:3px solid #c9dce3;border-top-color:var(--brand);border-radius:50%;animation:sp 0.9s linear infinite;flex:none}
+@keyframes sp{to{transform:rotate(360deg)}}
+.warnbox{background:var(--huom-bg);color:#6b4100;border-radius:10px;padding:10px 12px;margin:8px 0;font-size:14px}
+.warnlist div{padding:4px 0;font-size:14px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{border:1px solid #c9d6db;background:#fff;border-radius:20px;padding:6px 10px;font-size:13px;color:var(--brand)}
+details.prod summary{display:flex;justify-content:space-between;align-items:center;gap:8px;cursor:pointer;list-style:none}
+details.prod summary::-webkit-details-marker{display:none}
+details.prod ul{margin:8px 0 0;padding-left:18px;font-size:14px}
+.prow{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid #eee}
+.pchk input{width:22px;height:22px;margin-top:2px}
+.pbody{flex:1;min-width:0}
+.plabel{font-size:13px;color:var(--muted);margin-bottom:3px}
+.pbody input[type=text]{padding:8px;font-size:15px}
+.rv-sec{font-size:13px;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:.03em;margin:18px 0 4px}
+.rv-head{display:flex;justify-content:space-between;align-items:center;position:sticky;top:-18px;background:#fff;padding:6px 0;z-index:2}
+.rv-foot{display:flex;gap:8px;position:sticky;bottom:-18px;background:#fff;padding:12px 0;margin-top:10px;border-top:1px solid #eee}
+.rv-foot .btn{flex:1}
+.pchk2{display:flex;gap:8px;align-items:center;font-size:14px;margin-top:6px}
+.modal.full{align-items:stretch}
+.modal.full .box{max-width:760px;max-height:none;height:100%;border-radius:0}
+.btn:disabled{opacity:.45}
+nav.tabs button{font-size:13px}
+.crit{color:var(--puute);font-weight:700}
+.st.lbl button{font-size:12.5px;padding:10px 1px}
+.intro{background:#eef5f7;border-radius:10px;padding:10px 12px;margin:8px 0;font-size:14.5px}
+.rdate{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin:0 0 8px}
+.rdate input{width:auto;padding:6px 8px;font-size:14px}
+.verdict{border-left:6px solid var(--ek)}
+.verdict.v-ok{border-left-color:var(--ok);background:var(--ok-bg)}
+.verdict.v-ehd{border-left-color:var(--huom);background:var(--huom-bg)}
+.verdict.v-ei{border-left-color:var(--puute);background:var(--puute-bg)}
+.rp .vbox{border:0.3mm solid #999;border-left:2mm solid #999;padding:2mm 3mm;margin:3mm 0;font-size:9.5pt}
+.rp .vb-ok{border-left-color:#1f7a45}.rp .vb-ehd{border-left-color:#a8640a}.rp .vb-ei{border-left-color:#b3261e}
+.rp .req0{border:0.3mm solid #bbb;background:#f6f8f9;padding:2mm 3mm;font-size:9.5pt}
+/* report (PDF) */
+#report{position:absolute;left:-10000px;top:0;width:186mm;background:#fff;color:#000;font:10pt/1.35 Arial,Helvetica,sans-serif}
+.rp h1{font-size:16pt;margin:0 0 2mm}
+.rp h2{font-size:11pt;color:#000;text-transform:none;letter-spacing:0;margin:5mm 0 2mm;padding:1.5mm 2mm;background:#e6ecef;border-left:3px solid #1f4e5f}
+.rp table{width:100%;border-collapse:collapse}
+.rp td,.rp th{border:0.3mm solid #999;padding:1.4mm 1.8mm;vertical-align:top;text-align:left}
+.rp th{background:#f0f0f0;font-size:9pt}
+.rp .kv td:first-child{width:52mm;color:#333;background:#fafafa}
+.rp .no{width:9mm;font-weight:bold}
+.rp .tila{width:20mm;font-weight:bold;text-align:center}
+.rp .t-ok{color:#1f7a45}.rp .t-huom{color:#a8640a}.rp .t-puute{color:#b3261e}.rp .t-ek{color:#666}.rp .t-x{color:#999;font-weight:normal}
+.rp .rq{font-size:8.5pt;color:#444;margin-top:1mm}
+.rp .ims{display:flex;flex-wrap:wrap;gap:1.5mm;margin-top:1.5mm}
+.rp .ims img{width:40mm;height:30mm;object-fit:cover;border:0.2mm solid #999}
+.rp tr{page-break-inside:avoid}
+.rp h2{page-break-after:avoid;break-after:avoid}
+.rp .sign{display:flex;gap:8mm;margin-top:10mm}
+.rp .sign div{flex:1;border-top:0.3mm solid #000;padding-top:1mm;font-size:9pt}
+.rp .foot{font-size:8pt;color:#666;margin-top:6mm}
+@media print{
+  html,body{background:#fff!important}
+  body>*:not(#report){display:none!important}
+  #report{position:static;left:auto;width:100%}
+  @page{size:A4;margin:12mm 10mm}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="row">
+    <button class="iconbtn" id="homeBtn" aria-label="Katselmukset">☰</button>
+    <h1 id="hdrTitle">Mallikatselmus<small id="hdrSub">Märkätilat</small></h1>
+    <span class="sync" id="sync"></span>
+  </div>
+  <div class="prog"><i id="progBar"></i></div>
+  <nav class="tabs" id="tabs" style="display:none">
+    <button data-t="aineisto">Aineisto</button>
+    <button data-t="tiedot">Tiedot</button>
+    <button data-t="tarkastus" class="on">Tarkastus</button>
+    <button data-t="yhteenveto">Yhteenveto</button>
+  </nav>
+</header>
+
+<main class="wrap" id="main"></main>
+
+<div class="modal" id="modal"><div class="box" id="modalBox"></div></div>
+<div class="bigimg" id="bigimg"><img alt=""></div>
+<div class="toast" id="toast"></div>
+<div id="report"></div>
+
+<script>
+/* =====================================================================
+   TARKASTUSLISTA – märkätilan mallikatselmus
+   req  = vaatimus / työohje  -> tulostuu muistioon
+   how  = miten ja mitä tarkastetaan -> näkyy vain sovelluksessa
+   {avain} = projektikohtainen arvo (Tiedot-välilehti)
+   Lähteet: YM asetus 782/2017, RT 103811 (2025), RT 84-11166, RT 14-10984,
+   Ratu F61-0321, RIL 107. Projektin suunnitelmat ja valmistajan ohjeet ensisijaisia.
+   ===================================================================== */
+const PARAM_GROUPS = [
+ {name:"Mallikatselmus", params:[
+  ["toimitus_aika","Urakoitsijan asiakirjojen toimitus","viimeistään 3 arkipäivää","Ennen mallikatselmusta"]
+ ]},
+ {name:"Vedeneristys", params:[
+  ["ve_tuote","Vedeneristysjärjestelmä (valmistaja ja tuote)","","Suunnitelma / työselostus / urakoitsijan tuotevalinta"],
+  ["ve_sert","Järjestelmäsertifikaatti (nro, myöntäjä)","","Esim. Eurofins-sertifikaatti"],
+  ["ve_lattia","Lattian vedeneristystapa","","Sively / muovimatto / massa – huoneselostus"],
+  ["ve_kalvo","Kuivakalvopaksuus vähintään","","Seinät / lattiat – sertifikaatti tai valmistajan ohje"],
+  ["ve_kalvo_kaivo","Kalvopaksuus lattiakaivon kohdalla","",""],
+  ["ve_menekki","Menekki vähintään","","Seinät / lattiat"],
+  ["ve_kerrokset","Kerrosmäärä","2",""],
+  ["ve_pohjuste","Pohjusteaine","",""],
+  ["ve_vahvike","Vahvikenauhat, -kankaat ja nurkkakappaleet","",""],
+  ["ve_kuivuminen","Kuivumisajat (kerrosten väli / ennen laatoitusta)","","Valmistajan ohje"]
+ ]},
+ {name:"Lattiakaivo ja läpiviennit", params:[
+  ["kaivo","Lattiakaivo (valmistaja ja malli)","",""],
+  ["kaivo_mat","Kaivon / laipan materiaali","","Muovi, valurauta, RST"],
+  ["kaivo_liitos","Vedeneristeen liitos kaivoon","","Kiristysrengas, vahvikekaulus, kaivolaippa"],
+  ["kaivo_sert","Kaivon sertifikaatti / yhteensopivuus vedeneristeeseen","",""],
+  ["kaivo_kansi","Kaivon kansi ja kehys","","Neliökansi / pyöreä + valukorokerengas"],
+  ["korokerengas","Korokerenkaan käyttö","","Sallittu / ei sallittu"],
+  ["lapivienti","Läpivientitiivisteet (mansetit)","",""]
+ ]},
+ {name:"Alusta ja rakenteet", params:[
+  ["runko","Seinä- ja lattiarakenne","","Betoni / levy + runko"],
+  ["levy","Märkätilalevy (tuote, HHL-luokka)","","HHL3 tai parempi"],
+  ["alusta_rh","Alustan RH-raja ennen vedeneristystä","","Vedeneristeen valmistajan ohje"],
+  ["alusta_lampo","Työlämpötila","väh. +5 °C",""],
+  ["alusta_tas","Alustan tasaisuusvaatimus","±4 mm / 2000 mm","Vaativa kohde ±3 mm"]
+ ]},
+ {name:"Mitat ja raja-arvot", params:[
+  ["kall_yleinen","Lattian kallistus kaivoon","1:100",""],
+  ["kall_suihku","Kallistus kaivon ympärillä / suihkualueella","1:50 (n. 500 mm säteellä kaivosta)",""],
+  ["limitys","Seinäeristeen limitys lattiaeristeen päälle","30 mm","RT 103811: väh. 30 mm – tarkista suunnitelma"],
+  ["ylosnosto","Lattiaeristeen nosto seinälle","100 mm",""],
+  ["kynnys","Eristeen nosto kynnystä vasten valmiin lattian yläpuolelle","15 mm",""],
+  ["katto","Seinäeristeen yläreuna","100 mm alakaton yläpuolelle",""],
+  ["roiske","Seinien vedeneristysalue","1,5 m suihkupisteestä, koko seinän korkeus",""]
+ ]},
+ {name:"Laatoitus", params:[
+  ["laatta_lattia","Lattialaatta","",""],
+  ["laatta_seina","Seinälaatta","",""],
+  ["laasti_kiinnitys","Kiinnityslaasti","",""],
+  ["tartunta","Laastin peittävyys vähintään","seinät ¾, lattiat täysi",""],
+  ["laasti_sauma","Saumalaasti","",""],
+  ["elast_massa","Elastinen saumausmassa","",""]
+ ]}
+];
+
+const SECTIONS = [
+{id:"0", title:"Mallikatselmuksen edellytykset", photo:false,
+ labels:{ok:"Toimitettu",huom:"Puutteellinen",puute:"Puuttuu",ek:"Ei koske"},
+ desc:"Urakoitsijan ennakkoon toimittamat asiakirjat. Näillä varmistetaan, että mallikatselmus voidaan pitää. Merkintä * = välttämätön asiakirja.",
+ intro:"Urakoitsija toimittaa valvojalle {toimitus_aika} ennen mallikatselmusta käytettävän lattiakaivon tiedot, sertifikaatin ja asennusohjeen sekä vedeneristysjärjestelmän, pohjusteiden, vahvikkeiden, tasoitteiden ja laastien tuotetiedot, työohjeet ja sertifikaatit. Mallikatselmus pidetään, kun välttämättömät asiakirjat on toimitettu ja todettu suunnitelmien mukaisiksi.",
+ items:[
+ {id:"E01",crit:true,t:"Lattiakaivon tiedot ja sertifikaatti",
+  req:"Käytettävän lattiakaivon valmistaja ja malli sekä voimassa oleva tuotesertifikaatti (myös laippa, kiristysrengas ja muut liitososat): {kaivo}.",
+  how:"Tarkista, että kaivo vastaa LVI-suunnitelmaa ja että sertifikaatti on voimassa ja koskee juuri tätä mallia ja liitostapaa.",ref:"YM 782/2017 29 §; RT 103811 kohta 6.3"},
+ {id:"E02",crit:true,t:"Lattiakaivon asennusohje",
+  req:"Kaivovalmistajan asennusohje, jossa esitetään asennuskorko, kiinnitys ja vedeneristeen liitos ({kaivo_liitos}).",
+  how:"Varmista, että ohje on juuri toimitetulle kaivomallille ja että liitos vastaa vedeneristeen työohjetta.",ref:"RT 103811 kohta 5.2"},
+ {id:"E03",crit:true,t:"Kaivon ja vedeneristeen yhteensopivuus",
+  req:"Yhteensopivuus käytettävän vedeneristysjärjestelmän kanssa on osoitettu kaivon tai vedeneristeen sertifikaatissa tai valmistajan yhteensopivuusilmoituksessa: {kaivo_sert}.",
+  how:"Etsi kaivomalli vedeneristeen sertifikaatin tai valmistajan yhteensopivuuslistalta, tai vedeneriste kaivon sertifikaatista.",ref:"RT 103811 kohdat 5.2 ja 6.3"},
+ {id:"E04",crit:true,t:"Vedeneristysjärjestelmän sertifikaatti",
+  req:"Voimassa oleva järjestelmäsertifikaatti, joka kattaa käytettävät alustat ja järjestelmän osat: {ve_sert}.",
+  how:"Tarkista sertifikaatin numero, voimassaolo, alustat (betoni / levy) ja järjestelmään kuuluvat tuotteet.",ref:"RT 103811 kohta 6.3"},
+ {id:"E05",crit:true,t:"Vedeneristeen tuotetiedot ja työohje",
+  req:"Vedeneristeen ({ve_tuote}) tekninen tuotetieto, työohje ja käyttöturvallisuustiedote suomeksi.",
+  how:"Ohjeesta pitää löytyä kalvopaksuus, menekki, kerrosmäärä, kuivumisajat, olosuhteet ja yksityiskohtien teko.",ref:"RT 103811 kohta 4.5"},
+ {id:"E06",t:"Pohjusteet ja vahvikkeet",
+  req:"Pohjusteen ({ve_pohjuste}), vahvikenauhojen, läpivientikappaleiden, kaivolaipan tai -vahvikkeen ja tiivistemassojen tuotetiedot ja työohjeet; tuotteet kuuluvat sertifioituun järjestelmään.",
+  how:"Vertaa tuotteita järjestelmäsertifikaatin tuoteluetteloon.",ref:"RT 103811 kohta 6.3"},
+ {id:"E07",t:"Tasoitteet ja kallistusvalut",
+  req:"Seinä- ja lattiatasoitteiden sekä kallistusvalun massojen tuotetiedot ja työohjeet; yhteensopivuus vedeneristysjärjestelmän kanssa.",
+  how:"Tarkista, että tasoitteet soveltuvat märkätilaan ja vedeneristeen alustaksi (saman tuoteperheen tuotteet).",ref:"RT 103811 kohta 4.5"},
+ {id:"E08",t:"Kiinnitys- ja saumalaastit, elastinen massa",
+  req:"Kiinnityslaastin ({laasti_kiinnitys}), saumalaastin ({laasti_sauma}) ja elastisen massan ({elast_massa}) tuotetiedot; soveltuvat vedeneristeen päälle.",
+  how:"Tarkista laastiluokka (esim. C2) ja soveltuvuus vedeneristeen päälle.",ref:"Ratu F61-0321"},
+ {id:"E09",t:"Märkätilalevyt",
+  req:"Märkätilalevyjen ({levy}) tuotetiedot ja asennusohje.",
+  how:"Ei koske kiviaineisia rakenteita.",ref:"RT 103811 kohta 5.1"},
+ {id:"E10",t:"Vedeneristäjän pätevyys",
+  req:"Vedeneristystyön tekijän henkilösertifikaatti (nimi ja numero).",
+  how:"Pyydä kopio sertifikaatista ja tarkista voimassaolo.",ref:"RT 103811 kohdat 4.5 ja 6.3"},
+ {id:"E11",t:"Alustan kosteusmittaukset",
+  req:"Alustan rakennekosteuden mittauspöytäkirja (raja {alusta_rh}) tai mittaussuunnitelma, jos mittaus tehdään katselmuksen yhteydessä.",
+  how:"Tarkista mittausmenetelmä, -syvyys ja -kohdat.",ref:"RT 14-10984"},
+ {id:"E12",t:"Tuotejärjestelmän hyväksyntä",
+  req:"Jos käytettävät tuotteet poikkeavat suunnitelmasta tai työselostuksesta, tuotejärjestelmä on hyväksytetty valvojalla ja suunnittelijalla ennen töiden aloitusta.",
+  how:"Merkitse Ei koske, jos tuotteet ovat suunnitelman mukaiset.",ref:"Hankkeen työselostus"}
+]},
+{id:"A", title:"Asiakirjat ja materiaalitiedot", photo:false,
+ desc:"Tarkistetaan ennen työn aloitusta: suunnitelmat, sertifikaatit, tuotteet ja tekijät.", items:[
+ {id:"A1",t:"Suunnitelmat ja detaljit työmaalla",
+  req:"Voimassa olevat ARK-, RAK- ja LVI-suunnitelmat, märkätiladetaljit, laattajako ja kallistuskuva (korot) ovat työmaalla ja tekijöiden tiedossa.",
+  how:"Tarkista revisiot ja päiväykset. Varmista, että kaivon, kynnyksen, läpivientien ja seinä–lattialiittymän detaljit löytyvät. Puuttuvat tai ristiriitaiset tiedot kirjataan ja pyydetään suunnittelijalta ennen työn jatkamista.",
+  ref:"RT 103811 kohta 3.1"},
+ {id:"A2",t:"Työselostus ja laatuvaatimukset",
+  req:"Märkätilojen työselostus, laatuvaatimukset, niiden toteamistavat ja mittausmenetelmät ovat tekijöiden tiedossa.",
+  how:"Käy läpi työselostuksen märkätilaosuus tekijöiden kanssa: vaaditut tarkastukset, mittaukset ja pöytäkirjat.",
+  ref:"RT 103811 kohta 4.1"},
+ {id:"A3",t:"Vedeneristysjärjestelmä ja sertifikaatti",
+  req:"Työmaalla olevat tuotteet vastaavat toimitettua järjestelmää (kohdat 0.4–0.5): {ve_tuote}. Sertifikaatti: {ve_sert}. Lattian vedeneristys: {ve_lattia}.",
+  how:"Vertaa työmaalla olevia astioita / rullia suunniteltuun tuotteeseen. Tarkista sertifikaatin voimassaolo ja että se kattaa käytettävän alustan (betoni / levy) ja kaikki järjestelmän osat. Tuotteen vaihto vain suunnittelijan hyväksynnällä.",
+  ref:"YM 782/2017 28 §; RT 103811 kohta 6.3"},
+ {id:"A4",t:"Vedeneristeen asennusohje",
+  req:"Valmistajan asennusohje ja käyttöturvallisuustiedote saatavilla. Kerroksia {ve_kerrokset}, kuivakalvo väh. {ve_kalvo}, menekki {ve_menekki}, pohjuste {ve_pohjuste}, kuivumisajat {ve_kuivuminen}.",
+  how:"Käy ohje läpi tekijän kanssa: menekki (g/m² tai märkäkalvo), kerrosten värit, kuivumisajat, työlämpötila ja vahvikkeiden paikat. Kirjaa projektikohtaiset arvot Tiedot-välilehdelle.",
+  ref:"RT 103811 kohta 4.5"},
+ {id:"A5",t:"Lattiakaivo ja yhteensopivuus",
+  req:"Työmaalle tuotu kaivo vastaa toimitettuja tietoja (kohdat 0.1–0.3): {kaivo}, materiaali {kaivo_mat}. Kaivon ja vedeneristeen yhteensopivuus osoitettu: {kaivo_sert}. Liitostapa: {kaivo_liitos}.",
+  how:"Tarkista, että kaivon osat ja vedeneriste on todettu tyyppikokein yhteensopiviksi (sertifikaatit / valmistajan yhteensopivuuslista). Vanhaan kaivoon liitettäessä varmista korokerenkaan yhteensopivuus ja valmistajan hyväksymä liitosmenetelmä.",
+  ref:"YM 782/2017 29 §; RT 103811 kohta 5.2"},
+ {id:"A6",t:"Läpivientien ja liitosten tarvikkeet",
+  req:"Läpivientitiivisteet ({lapivienti}) sekä vahvikkeet ({ve_vahvike}) kuuluvat vedeneristysjärjestelmään.",
+  how:"Tarkista, että mansetit ovat oikeaa kokoa putkille ja että vahvikkeet ovat saman järjestelmän osia – ei sekatuotteita.",
+  ref:"RT 103811 kohta 6.3"},
+ {id:"A7",t:"Laatoitusmateriaalit",
+  req:"Lattialaatta {laatta_lattia}, seinälaatta {laatta_seina}, kiinnityslaasti {laasti_kiinnitys}, saumalaasti {laasti_sauma} ja elastinen massa {elast_massa} suunnitelman mukaiset ja yhteensopivat vedeneristeen kanssa.",
+  how:"Tarkista tuoteselosteesta laastin soveltuvuus märkätilaan ja vedeneristeen päälle. Lattialaatan liukkaus ja kaivon sovitus laattajakoon.",
+  ref:"Ratu F61-0321"},
+ {id:"A8",t:"Rakennuslevyt (levyrakenteet)",
+  req:"Märkätilaan soveltuva levy {levy}, homehtumisherkkyysluokka HHL3 tai parempi; runko ja jäykistys levyvalmistajan ohjeen mukaan.",
+  how:"Merkitse Ei koske, jos seinät ja lattia ovat kiviaineisia. Tarkista levyn tuotetiedot ja rankajako / ruuvijako ohjeesta.",
+  ref:"RT 103811 kohta 5.1"},
+ {id:"A9",t:"Tekijöiden pätevyys",
+  req:"Vedeneristäjällä märkätilojen henkilösertifikaatti; nimi ja sertifikaatin numero kirjattu perustietoihin.",
+  how:"Pyydä sertifikaattikortti nähtäväksi ja tarkista voimassaolo. Tulityötä tehtäessä tulityökortti.",
+  ref:"RT 103811 kohdat 4.5 ja 6.3"},
+ {id:"A10",t:"Laadunvarmistus ja pöytäkirjat",
+  req:"Urakoitsijan laadunvarmistussuunnitelma laadittu; vedeneristäjän työkohdepöytäkirja ja kosteusmittauspöytäkirja käytössä.",
+  how:"Tarkista, että pöytäkirjapohjat ovat olemassa ja että niihin kirjataan tuotteet, erät, kerrokset, kalvopaksuus ja olosuhteet.",
+  ref:"RT 103811 kohdat 4.1 ja 4.6"},
+ {id:"A11",t:"Materiaalien säilytys ja käyttöaika",
+  req:"Materiaalit säilytetty valmistajan ohjeen mukaan (ei jäätynyt, kuiva), käyttöaika voimassa, eränumerot kirjattavissa.",
+  how:"Katso astioiden valmistuspäivät ja eränumerot. Laastit kuivassa paikassa.",
+  ref:"Ratu F61-0321"}
+]},
+{id:"B", title:"Alusta ennen vedeneristystä", photo:true,
+ desc:"Vedeneristystyön aloituskatselmus mallitilassa.", items:[
+ {id:"B1",t:"Rakennekosteus",
+  req:"Alustan suhteellinen kosteus mitattu ja alittaa raja-arvon ({alusta_rh}).",
+  how:"Pyydä mittauspöytäkirja (porareikä- tai näytepalamittaus, pätevä mittaaja). Tarkista mittaussyvyys, mittauskohdat, lämpötila ja päivämäärä. Pintakosteusmittari on vain suuntaa antava.",
+  ref:"RT 14-10984; RT 103811 kohta 4.5"},
+ {id:"B2",t:"Alustan lujuus ja puhtaus",
+  req:"Alusta kiinteä, luja, pölytön ja puhdas; sementtiliima, irtoaines, rasva ja vanhat laastit poistettu.",
+  how:"Raaputa ja harjaa pintaa, tee naarmutuskoe. Betonivalun sementtiliima pitää poistaa ennen eristystä.",
+  ref:"RT 84-11166 kohta 2.2; RT 103811 kohta 5.1"},
+ {id:"B3",t:"Tasaisuus ja epäjatkuvuuskohdat",
+  req:"Tasaisuus {alusta_tas}; ei kuoppia, kohoumia, isoja huokosia, rakoja eikä terävää hammastusta.",
+  how:"Mittaa 2 m oikolaudalla ja kiilalla seinistä ja lattiasta. Kuopat ja huokoset ohentavat kalvoa – vaadi tasoitus ennen eristystä.",
+  ref:"Ratu F61-0321; RT 103811 kohta 6.4"},
+ {id:"B4",t:"Lattian kallistukset ja korot",
+  req:"Kallistus kaivoon väh. {kall_yleinen}, suihkualueella {kall_suihku}; korot vastaavat kallistuskuvaa.",
+  how:"Mittaa vaa'alla / laserilla nurkkapisteiden ja kaivon korot ja vertaa suunnitelmaan. Kaada vettä: vesi ei saa jäädä seisomaan (pintajännityksen aiheuttama pieni lammikoituminen sallitaan). Huomioi wc-istuimen ja pesukoneen kohta.",
+  ref:"YM 782/2017 29 §; RT 103811 kohta 5.1"},
+ {id:"B5",t:"Kaivon sijainti ja ympärysvalu",
+  req:"Kaivo laattajaon mukaisessa paikassa ja oikeassa korossa; levyrakenteessa pintavalu kaivon ympärillä väh. 50 mm.",
+  how:"Tarkista kaivon etäisyys seinistä ja sovitus laattajakoon. Kaivon ympärysvalu tiivis ja halkeamaton.",
+  ref:"RT 103811 kohdat 5.1–5.2; RT 84-11166"},
+ {id:"B6",t:"Runko, levytys ja taustavahvistukset",
+  req:"Runko jäykkä, levyt kiinnitetty valmistajan ruuvijaolla, levysaumat ja ruuvinkannat käsitelty, kalusteiden taustavahvistukset paikallaan.",
+  how:"Paina levyä – ei joustoa. Tarkista ruuvinkantojen upotus ja taustapuut kalusteille, hanoille ja suihkuseinälle. Ei koske kiviaineisia rakenteita.",
+  ref:"YM 782/2017 28 §; RT 103811 kohta 5.1"},
+ {id:"B7",t:"Putket ja läpivientien paikat",
+  req:"Läpivientejä mahdollisimman vähän, suunnitelman mukaisissa paikoissa, putket kiinnitetty jäykästi. Lattiaan ei ylimääräisiä läpivientejä.",
+  how:"Liikuttele putkia – eivät saa heilua. Läpivientien väli ja etäisyys nurkista riittää tiivisteen asentamiseen.",
+  ref:"RT 103811 kohta 4.4"},
+ {id:"B8",t:"Olosuhteet",
+  req:"Alustan, materiaalien ja ilman lämpötila {alusta_lampo}, riittävä tuuletus, ei liian nopeaa kuivumista.",
+  how:"Mittaa lämpötila. Tarkista ettei lämpöpuhallin tai veto kuivata eristettä liian nopeasti.",
+  ref:"Ratu F61-0321"},
+ {id:"B9",t:"Liittyvät rakenteet valmiina",
+  req:"Kynnys / karmi, ikkunat ja alakaton korko valmiina niin, että vedeneristys voidaan liittää niihin.",
+  how:"Varmista kynnyksen korko suhteessa valmiiseen lattiaan ja alakaton korko seinäeristeen nostoa varten.",
+  ref:"RT 103811 kohta 5.4"}
+]},
+{id:"C", title:"Lattiakaivo ja läpiviennit", photo:true,
+ desc:"Kaivon ja läpivientien asennus ja liittäminen vedeneristykseen.", items:[
+ {id:"C1",t:"Kaivon asennus",
+  req:"Kaivo {kaivo} asennettu tukevasti, vaakaan ja oikeaan korkoon valmistajan ohjeen mukaan; laippa puhdas ja ehjä.",
+  how:"Tarkista laipan puhtaus ja kiristysrenkaan kierteet / ruuvit. Vanha valurautakaivo: ruoste poistettu ja ruostesuojattu.",
+  ref:"RT 103811 kohta 5.2"},
+ {id:"C2",t:"Korokerengas",
+  req:"Korokerengas: {korokerengas}. Jos käytetään, se on kaivoon sopiva, oikean mittainen, tartuntakohta karhennettu ja kiinnitetty tiiviisti valmistajan menetelmällä.",
+  how:"Ei koske, jos uusi kaivo asennetaan oikeaan korkoon ilman korokerengasta.",
+  ref:"RT 103811 kohta 5.2"},
+ {id:"C3",t:"Vedeneristeen liitos kaivoon",
+  req:"Liitos ({kaivo_liitos}) tehty kaivon ja vedeneristeen valmistajien ohjeen mukaan; eriste ja vahvike peittävät laipan, kiristysrengas kiristetty; kalvo kaivon kohdalla väh. {ve_kalvo_kaivo}.",
+  how:"Seuraa työ mallissa kokonaan. Kaulus ei saa olla ryppyinen, eriste peittää laipan kauttaaltaan eikä kiristysrenkaan alle jää rakoa tai ilmaa.",
+  ref:"YM 782/2017 29 §; RT 103811 kohta 5.2"},
+ {id:"C4",t:"Putkiläpiviennit",
+  req:"Jokaisessa läpiviennissä järjestelmän läpivientitiiviste upotettuna eristeeseen; reiät levyssä käsitelty.",
+  how:"Tarkista mansetin koko, ettei se ole venynyt tai ryppyinen ja että eriste kulkee mansetin reunojen yli.",
+  ref:"Ratu F61-0321; RT 103811 kohta 4.6"},
+ {id:"C5",t:"Kynnys-, nurkka- tai seinänvieruskaivo",
+  req:"Asennettu kaivon ja vedeneristeen valmistajien ohjeen mukaan.",
+  how:"Ei koske, jos tällaista kaivoa ei ole.",
+  ref:"RT 103811 kohta 5.2"}
+]},
+{id:"D", title:"Vedeneristys", photo:true,
+ desc:"Vedeneristystyö ja valmiin eristyksen tarkastus.", items:[
+ {id:"D1",t:"Pohjustus",
+  req:"Pohjuste {ve_pohjuste} levitetty koko eristettävälle alueelle ja kuivunut ennen eristystä.",
+  how:"Tarkista kuivumisaika ohjeesta ja ettei pohjustetta ole jäänyt lammikoiksi.",
+  ref:"Ratu F61-0321"},
+ {id:"D2",t:"Nurkat, saumat ja liittymät",
+  req:"Sisä- ja ulkonurkat, lattia–seinäliittymä, levysaumat ja materiaalien liittymät vahvistettu järjestelmän vahvikkeilla ({ve_vahvike}).",
+  how:"Vahvike painettu tuoreeseen eristeeseen, ei ryppyjä eikä ilmakuplia; eriste levitetty vahvikkeen reunojen yli.",
+  ref:"Ratu F61-0321"},
+ {id:"D3",t:"Seinien eristysalue",
+  req:"Seinät eristetty suunnitelman mukaan, vähintään roiskevesialueelta ({roiske}) ja ammeen kohdalta; eristeen yläreuna: {katto}.",
+  how:"Mittaa eristetyn alueen laajuus suihkupisteestä ja eristeen yläreunan korko suhteessa alakattoon.",
+  ref:"Ratu F61-0321; RT 103811 kohta 6"},
+ {id:"D4",t:"Lattian eristys ja seinälimitys",
+  req:"Lattia eristetty koko alueelta. Seinäeriste limitetty lattiaeristeen päälle väh. {limitys}; lattiaeriste nostettu seinälle väh. {ylosnosto}.",
+  how:"Mittaa limitys ja ylösnostot. Lattian ja seinän eristyksen on liityttävä vesitiiviisti.",
+  ref:"YM 782/2017 28 §; RT 103811 kohta 6"},
+ {id:"D5",t:"Kynnys ja ovi",
+  req:"Eriste nostettu kynnystä / kynnyksen alusrakennetta vasten väh. {kynnys} valmiin lattian yläpuolelle; liitos karmiin tiivis.",
+  how:"Mittaa nosto valmiin lattian korosta (laatta + laasti huomioiden).",
+  ref:"RT 103811 kohta 5.4"},
+ {id:"D6",t:"Ikkunat ja muut liittymät",
+  req:"Eriste liitetty ikkunakarmiin ja muihin rakenneosiin vesitiiviisti.",
+  how:"Ei koske, jos tilassa ei ole ikkunaa tai vastaavaa liittymää.",
+  ref:"RT 103811 kohta 5.4"},
+ {id:"D7",t:"Kerrokset ja kalvopaksuus",
+  req:"Kerroksia {ve_kerrokset}; kuivakalvo väh. {ve_kalvo}; menekki väh. {ve_menekki}. Koepalat paikattu valmistajan korjausohjeella.",
+  how:"Ota koepala lattiasta ja seinästä ja mittaa paksuus luupilla / mikrometrillä. Paikkaa koepalan kohta ja kirjaa paikka. Tarkista menekki käytetyistä astioista.",
+  ref:"RT 103811 kohta 4.6; RT 84-11166"},
+ {id:"D8",t:"Eristeen yhtenäisyys",
+  req:"Eriste yhtenäinen ja ehjä: ei reikiä, huokosia, kuplia, valumia tai ohuita kohtia; väri tasainen.",
+  how:"Valaise pintaa viistosti lampulla. Kerrosten eri värit auttavat näkemään ohuet kohdat.",
+  ref:"YM 782/2017 28 §"},
+ {id:"D9",t:"Kalusteiden kiinnityskohdat",
+  req:"Kalusteiden ja varusteiden kiinnityskohdat tiedossa ja tiivistetään järjestelmän ohjeen mukaan; eristettä ei rikota tarpeettomasti.",
+  how:"Sovi kuka porauksen tekee ja millä tiivistetään ruuvien läpimenot.",
+  ref:"Ratu F61-0321"},
+ {id:"D10",t:"Kuivuminen ja suojaus",
+  req:"Eriste kuivunut valmistajan ajan ({ve_kuivuminen}) ennen laatoitusta ja suojattu kolhuilta ja lialta; tila rauhoitettu.",
+  how:"Tarkista eristyksen päivämäärä ja kellonaika työkohdepöytäkirjasta.",
+  ref:"RT 103811 kohta 4.5"},
+ {id:"D11",t:"Lattian vesikoe",
+  req:"Kuivuneella eristeellä tehty vesikoe: vesi valuu kaivoon, ei lammikoita, kaivoliitos tiivis.",
+  how:"Kaada vettä ympäri lattiaa ja seuraa valumista kaivoon.",
+  ref:"RT 103811 kohta 4.6"},
+ {id:"D12",t:"Työkohdepöytäkirja",
+  req:"Vedeneristäjän työkohdepöytäkirja täytetty (tuotteet, erät, kerrokset, menekit, kalvopaksuus, olosuhteet).",
+  how:"Pyydä pöytäkirja nähtäväksi ja tarkista allekirjoitus.",
+  ref:"RT 103811 kohta 4.6"}
+]},
+{id:"E", title:"Laatoitus", photo:true,
+ desc:"Laattojen kiinnitys mallitilassa.", items:[
+ {id:"E1",t:"Laattajako",
+  req:"Laattajako suunnitelman mukainen; leikatut laatat symmetrisesti nurkissa ja lattian rajassa, kaivo sovitettu laattajakoon, aukkojen reunat saumalinjassa.",
+  how:"Vertaa laattajakopiirustukseen. Tarkista aloituslinjan suoruus.",
+  ref:"Ratu F61-0321"},
+ {id:"E2",t:"Kiinnityslaasti ja tartunta",
+  req:"Kiinnityslaasti {laasti_kiinnitys}. Laastin peittävyys väh. {tartunta}; laastia korkeintaan sauman puoliväliin.",
+  how:"Irrota tuoreeltaan yksi seinä- ja yksi lattialaatta ja tarkista laastipeite. Lattian tyhjät kohdat keräävät vettä.",
+  ref:"Ratu F61-0321"},
+ {id:"E3",t:"Vedeneristeen ehjyys",
+  req:"Eristettä ei ole rikottu (aloituslinjaari, kiilat, leikkaukset); vauriot korjattu ennen laatoitusta. Alin seinärivi laatoitettu lattian eristyksen jälkeen.",
+  how:"Tarkista linjaarin kiinnityskohdat ja nurkat ennen laatoitusta.",
+  ref:"Ratu F61-0321"},
+ {id:"E4",t:"Saumalinjat ja tasaisuus",
+  req:"Saumat suorat, tasaleveät ja kohdakkain; laattapinta tasainen ilman huulletusta.",
+  how:"Oikolauta ja valo viistosti.",
+  ref:"Ratu F61-0321"},
+ {id:"E5",t:"Valmiin lattian kallistus",
+  req:"Laatoitettu lattia kallistuu kaivoon ({kall_yleinen}, suihkualueella {kall_suihku}); vesikokeessa ei lammikoitumista.",
+  how:"Vesikoe laatoituksen kovetuttua. Erityisesti wc-istuimen, pesukoneen ja kynnyksen kohdat.",
+  ref:"YM 782/2017 29 §; RT 103811 kohta 5.1"},
+ {id:"E6",t:"Lattiakaivon kansi ja kehys",
+  req:"Kehys / kansi ({kaivo_kansi}) kiinnitetty keskeisesti kiinnityslaastilla; vesilukko nostettavissa; vedeneriste ei jää näkyviin.",
+  how:"Nosta vesilukko ylös. Tarkista ettei eriste jää paljaaksi kaivon reunassa.",
+  ref:"RT 103811 kohta 5.2"},
+ {id:"E7",t:"Läpiviennit laatoituksessa",
+  req:"Laattojen reiät siistit ja ruusukkeiden alle jää tila elastiselle massalle.",
+  how:"Tarkista reikien koko putkiin nähden.",
+  ref:"Ratu F61-0321"}
+]},
+{id:"F", title:"Saumaus ja viimeistely", photo:true,
+ desc:"Saumaus, elastiset saumat ja valmiin tilan tarkastus.", items:[
+ {id:"F1",t:"Kuivuminen ennen saumausta",
+  req:"Laatoitus kuivunut valmistajan ohjeen mukaan (tyypillisesti 3–5 vrk) ennen saumausta.",
+  how:"Tarkista laatoituspäivä.",
+  ref:"Ratu F61-0321"},
+ {id:"F2",t:"Saumaus",
+  req:"Saumalaasti {laasti_sauma}: saumat täynnä, tiiviit ja tasaiset, ei reikiä tai halkeamia; pinta puhdistettu.",
+  how:"Katso saumat läheltä valolla. Ylipursunut kiinnityslaasti poistettu ennen saumausta.",
+  ref:"Ratu F61-0321"},
+ {id:"F3",t:"Elastiset saumat",
+  req:"Sisä- ja ulkonurkat, seinä–lattialiittymä, liikuntasaumat ja eri materiaalien liittymät saumattu elastisella massalla ({elast_massa}) – ei saumalaastilla.",
+  how:"Tarkista massan tartunta ja ettei sauman alla ole saumalaastia.",
+  ref:"Ratu F61-0321; RT 103811 kohta 4.5"},
+ {id:"F4",t:"Läpivientien ja kiinnikkeiden tiivistys",
+  req:"Putkien ja laatoituksen välit sekä kalusteiden kiinnikkeiden reiät tiivistetty elastisella massalla.",
+  how:"Tarkista jokainen läpivienti ja kiinnitysruuvi.",
+  ref:"Ratu F61-0321"},
+ {id:"F5",t:"Kynnys",
+  req:"Kynnys / kynnyslista asennettu, eristeen nosto peitetty siististi ja kynnyksen kohta tiivis.",
+  how:"Tarkista ettei vesi pääse kynnyksen alta kuivan tilan puolelle.",
+  ref:"RT 103811 kohta 5.4"},
+ {id:"F6",t:"Valmis pinta",
+  req:"Laatat ehjiä ja puhtaita, sävy yhtenäinen; ei lohkeamia eikä laastijäämiä.",
+  how:"Silmämääräinen tarkastus normaalivalaistuksessa.",
+  ref:"Ratu F61-0321"},
+ {id:"F7",t:"Lopullinen vesikoe ja kaivon toiminta",
+  req:"Vesi valuu kaivoon koko lattialta; vesilukko paikallaan ja puhdistettavissa.",
+  how:"Valuta vettä suihkusta ja tarkista koko lattia.",
+  ref:"YM 782/2017 29 §"},
+ {id:"F8",t:"Luovutusaineisto",
+  req:"Ylijäämälaattoja varattu korjauksia varten, käyttö- ja hoito-ohjeet sekä tuotetiedot huoltokirjaan.",
+  how:"Sovi kuka kokoaa aineiston ja mihin mennessä.",
+  ref:"RT 103811 kohta 4.7; Ratu F61-0321"}
+]}
+];
+
+const INFO_FIELDS = [
+ ["hanke","Hanke / kohde"],["osoite","Osoite"],["tila","Huoneisto / tila (mallitila)"],
+ ["pvm","Päivämäärä","date"],["tilaaja","Tilaaja / rakennuttaja"],["urakoitsija","Urakoitsija"],
+ ["vedeneristaja","Vedeneristäjä ja sertifikaatin nro"],["tarkastaja","Tarkastaja / valvoja"],
+ ["lasna","Läsnä","area"]
+];
+const ST = {ok:"OK",huom:"Huom",puute:"Puute",ek:"Ei koske"};
+const ST_LONG = {ok:"OK",huom:"Huomautus",puute:"Puute",ek:"Ei koske"};
+const DEC = {hyv:"Hyväksytty",kor:"Hyväksytty korjauksin",ei:"Ei hyväksytty"};
+
+/* ===================== TUOTEKIRJASTO =====================
+   Lähteet: Kiilto Kerafiber -vedeneristysjärjestelmän työohje (0224),
+   Kiilto PrimerOne tekninen tiedote 02.12.2024, kiilto.com tuotesivut
+   (Keraprimer, Kerafiber, Pro XPU), jälleenmyyjien tuotetiedot (XPU).
+   core:true = järjestelmän perustuote; muut ovat Kerafiber-ohjeessa
+   esimerkkeinä mainittuja laasteja / massoja. */
+const PRODUCTS = {
+ kerafiber:{core:true,name:"Kiilto Kerafiber vedeneriste",match:/kerafiber/i,src:"Kiilto Kerafiber -järjestelmän työohje; kiilto.com",
+  data:["1-komponenttinen, mikrokuituvahvistettu vedeneriste laatoitettaville pinnoille sisätiloissa. CE / ETA (ETAG 022), Eurofins tuotesertifikaatti C51/99 (työohjeessa vielä VTT 141/00 – tarkista voimassa oleva).",
+   "Menekki: seinät väh. 0,6 l/m² = kuivakalvo 0,4 mm; lattiat väh. 0,8 l/m² = 0,5 mm. Lattiakaivon kohdalla kalvo väh. 1,2 mm.",
+   "Väh. 2 levityskertaa. 1. kerros kuivuu väh. 2 h / värimuutos, 2. kerros 6–12 h / värimuutos ennen laatoitusta.",
+   "Alusta: betoni max 90 % RH. Rakenne ja ilma 15–25 °C. Lattialämmitys pois 2 vrk ennen työtä, päälle asteittain n. viikon kuluttua saumauksesta. Kuivumista ei nopeuteta lisälämmittimillä.",
+   "Valmiin kalvon lämmönkesto alle 70 °C (huomioi kiukaan läheisyys).",
+   "Vahvikkeet: nurkkavahvikenauha 10/20 cm, lattia–seinäliittymässä nosto seinälle väh. 5 cm, vahvikekankaiden limitys väh. 30 mm. Kaivo: 2 lattiakaivovahviketta ristiin tai Easy Kaivolaippa + kaivon kiristysrengas."],
+  params:{ve_tuote:"Kiilto Kerafiber (1-komponenttinen)",ve_sert:"Eurofins tuotesertifikaatti C51/99, CE/ETA (ETAG 022)",ve_kalvo:"seinät 0,4 mm, lattiat 0,5 mm",ve_kalvo_kaivo:"1,2 mm",ve_menekki:"seinät 0,6 l/m², lattiat 0,8 l/m²",ve_kerrokset:"väh. 2",ve_kuivuminen:"1. krs väh. 2 h (värimuutos), 2. krs 6–12 h ennen laatoitusta",alusta_rh:"max 90 % RH",alusta_lampo:"+15…+25 °C (rakenne ja ilma)"},
+  checks:[
+   {sec:"B",t:"Kerafiber: työolosuhteet",req:"Rakenteen ja ilman lämpötila 15–25 °C; lattialämmitys kytketty pois 2 vrk ennen työtä; kuivatukseen ei käytetä lisälämmittimiä.",how:"Mittaa lattian ja ilman lämpötila. Tarkista lattialämmityksen termostaatti."},
+   {sec:"C",t:"Kerafiber: kaivoliitos",req:"Eristettä n. 40 × 40 cm kaivon ympärille; kaivon kohdalle leikattu reikä väh. 40 mm kaivon halkaisijaa pienempi ja reuna ulottuu kaivon tiivisteen yli; kiristysrengas painunut kunnolla; kalvo kaivon kohdalla väh. 1,2 mm.",how:"Seuraa kaivoliitoksen teko mallissa vaiheittain ja mittaa reiän koko."},
+   {sec:"D",t:"Kerafiber: vahvikkeet ja limitykset",req:"Lattia–seinäliittymän vahvikenauha nostettu seinälle väh. 5 cm; vahvikkeiden limitys väh. 30 mm; vahvikkeet upotettu tuoreeseen eristeeseen ja sivelty yli.",how:"Mittaa nosto ja limitykset ennen 2. kerrosta."},
+   {sec:"D",t:"Kerafiber: menekki ja kerrokset",req:"Menekki seinät väh. 0,6 l/m² (0,4 mm), lattiat väh. 0,8 l/m² (0,5 mm); 1. kerros kuivunut (värimuutos) ennen 2. kerrosta; ohuet ja huokoiset kohdat paikattu.",how:"Laske käytetyt litrat eristettyä neliötä kohden ja ota koepalat."},
+   {sec:"F",t:"Kerafiber: lattialämmityksen käyttöönotto",req:"Lattialämmitys kytketään asteittain päälle n. viikon kuluttua saumauksesta.",how:"Sovi kuka kytkee ja milloin."}]},
+ primerone:{core:true,name:"Kiilto PrimerOne -tartuntapohjuste",match:/primer\s*one/i,src:"Kiilto PrimerOne tekninen tiedote 02.12.2024; Kerafiber-työohje",
+  data:["Nopeasti kuivuva, vesiohenteinen tartuntapohjuste Kiilto-vedeneristeille märkätilaan soveltuville tasoite-, betoni- ja levypinnoille.",
+   "Kerafiberin alla: betoni, tasoite ja levyt ohentamattomana; huokoisilla alustoilla voidaan ohentaa 1:1 vedellä.",
+   "Kuivumisaika n. 30 min olosuhteista riippuen; Kerafiber-ohjeen mukaan kuivuu väh. 30–60 min ennen vedeneristystä.",
+   "Riittoisuus ohentamattomana n. 8 m²/l. Käyttölämpötila +10…+25 °C. Jäätyvää."],
+  params:{ve_pohjuste:"Kiilto PrimerOne (kuivuu väh. 30–60 min ennen eristystä)"},
+  checks:[{sec:"D",t:"PrimerOne: pohjustus",req:"PrimerOne levitetty ohuena, tasaisena kerroksena alustan mukaisella laimennuksella (ohentamaton, huokoisilla alustoilla 1:1); kuivunut väh. 30–60 min ennen vedeneristystä; ei lammikoita.",how:"Kysy laimennus ja levitysaika; pinta ei saa olla tahmea."}]},
+ keraprimer:{core:true,name:"Kiilto Keraprimer -tartuntapohjuste",match:/kera\s*primer/i,src:"kiilto.com Keraprimer; Kerafiber-työohje",
+  data:["Vesiohenteinen tartuntapohjuste siveltäville Kiilto-vedeneristeille.",
+   "Laimennus: betoni ja tasoite 1:1 vedellä; kipsilevy ja imukyvyttömät levyt ohentamattomana; muut imukykyiset levyt 1:1.",
+   "Kuivuminen 1–2 h olosuhteista riippuen (Kerafiber-ohje: väh. 30–60 min). Pohjusteen on oltava kuiva ennen eristystä.",
+   "Riittoisuus 1:1 laimennettuna n. 16 m²/l, ohentamattomana n. 8 m²/l. Käyttölämpötila +10…+25 °C."],
+  params:{ve_pohjuste:"Kiilto Keraprimer (betoni/tasoite 1:1, kipsilevy ohentamaton; kuivuminen 1–2 h)"},
+  checks:[{sec:"D",t:"Keraprimer: pohjustus",req:"Keraprimer laimennettu alustan mukaan (betoni/tasoite 1:1, kipsilevy ja imukyvyttömät ohentamattomana), hierretty ohueksi kerrokseksi ja kuivunut ennen vedeneristystä.",how:"Tarkista laimennus ja kuivuminen."}]},
+ xpu:{core:true,name:"Kiilto Pro XPU liima-, tiiviste- ja vahvikemassa",match:/\bxpu\b/i,src:"Kiilto Pro XPU tuotetiedot; Kerafiber-työohje",
+  data:["Erittäin elastinen, polyuretaanivahvistettu silyylipolymeerimassa. Liuotteeton, M1.",
+   "Käy Kiillon 1-komponenttisten vedeneristeiden kanssa nurkkien, saumojen ja läpivientien tiivistykseen ilman erillistä vahvikekangasta. Levitetään ennen vedeneristettä.",
+   "Sauma massataan täyteen ja massan on ulotuttava molempien vahvistettavien pintojen päälle.",
+   "Avoin aika n. 10 min, kovettuminen n. 3 mm/vrk, käyttölämpötila +1…+40 °C.",
+   "Sopivat alustat: betoni, muuraus, sementtipohjainen tasoite, märkätilalevyt."],
+  params:{},
+  checks:[{sec:"C",t:"XPU: läpivientien tiivistys",req:"Läpiviennit tiivistetty Kiilto Pro XPU:lla: massa koko kehällä, täyttää raon ja ulottuu sekä putkeen että alustaan; vedeneriste levitetty massan päälle.",how:"Tarkista ennen 1. vedeneristekerrosta, ettei massassa ole aukkoja."},
+   {sec:"D",t:"XPU: nurkat ja saumat",req:"Jos nurkkavahvikenauhan sijaan käytetään XPU:ta: sauma täyteen massattu, massa ulottuu molemmille pinnoille ja on kovettunut riittävästi ennen eristystä.",how:"Tarkista massan leveys kummallakin pinnalla."}]},
+ easy:{core:true,name:"Kiilto Easy Kaivolaippa",match:/easy\s*kaivolaip|kaivolaippa/i,src:"Kerafiber-työohje",
+  data:["Itseliimautuva kaivolaippa (37 × 37 cm), testattu yleisimpien kaivotyyppien kanssa.",
+   "Asennetaan kuivuneeseen pohjustepintaan ja hierretään huolellisesti kiinni.",
+   "Reikä leikataan kaivovalmistajan ohjeen mukaan ja kiristysrengas painetaan paikalleen.",
+   "Laipan sivujen vahvikekankaat sivellään Kerafiberillä, ja koko laippa sivellään kiristysrenkaaseen asti."],
+  params:{kaivo_liitos:"Kiilto Easy Kaivolaippa + kaivon kiristysrengas"},
+  checks:[{sec:"C",t:"Easy Kaivolaippa: asennus",req:"Laippa liimattu kuivuneeseen pohjusteeseen ja hierretty kiinni ilman ilmakuplia; reikä kaivovalmistajan ohjeen mukainen; kiristysrengas paikallaan; vahvikekankaat ja koko laippa sivelty Kerafiberillä kiristysrenkaaseen asti.",how:"Tarkista laipan reunojen tartunta ja kiristysrenkaan asento."}]},
+ kaivovahvike:{core:true,name:"Kiilto Lattiakaivovahvike",match:/lattiakaivovahvik/i,src:"Kerafiber-työohje",
+  data:["Kaksi 30 × 30 cm vahviketta ristikkäin tuoreeseen Kerafiberiin ja sivellään yli.","Kiristysrenkaan ja kaivon liitoskohta voidaan tiivistää Kiilto Pro Masalla."],
+  params:{kaivo_liitos:"2 × Kiilto Lattiakaivovahvike ristiin + kaivon kiristysrengas"},
+  checks:[{sec:"C",t:"Lattiakaivovahvikkeet",req:"Kaksi lattiakaivovahviketta ristikkäin tuoreessa Kerafiberissä ja sivelty yli; kiristysrengas paikallaan ja sen alta esiin jäävä eriste leikattu.",how:"Tarkista vahvikkeiden asento ja läpikastuminen."}]},
+ nurkka:{core:true,name:"Kiilto Nurkkavahvikenauha",match:/nurkkavahvik/i,src:"Kerafiber-työohje",
+  data:["Leveys 10 tai 20 cm nurkissa, 10 cm saumoissa. Upotetaan tuoreeseen Kerafiberiin ja sivellään yli.","Lattia–seinäliittymässä nosto seinälle väh. 5 cm; limitys väh. 30 mm. Nurkissa ja läpivienneissä voi käyttää valmiita kappaleita."],
+  params:{ve_vahvike:"Kiilto Nurkkavahvikenauha 10/20 cm, valmiit nurkka- ja läpivientikappaleet"},checks:[]},
+ masa:{name:"Kiilto Pro Masa",match:/pro\s*masa|masa\s*liima/i,src:"Kerafiber-työohje",
+  data:["1-komponenttinen liima- ja tiivistemassa; voidaan käyttää kiristysrenkaan ja kaivon liitoskohdan tiivistykseen."],params:{},checks:[]},
+ superfix:{name:"Kiilto Superfix DF",match:/superfix/i,src:"Kerafiber-työohje",data:["Kevyttäytteinen saneerauslaasti, erityisesti isoille seinälaatoille. C2TES1 (C2ES2 Fixbinderilla)."],params:{laasti_kiinnitys:"Kiilto Superfix DF (C2TES1)"},checks:[]},
+ flexfix:{name:"Kiilto Flexfix",match:/flexfix/i,src:"Kerafiber-työohje",data:["Monikäyttöinen saneerauslaasti, pitkä avoin aika. C2TES1."],params:{laasti_kiinnitys:"Kiilto Flexfix (C2TES1)"},checks:[]},
+ kerapid:{name:"Kiilto Kerapid DF",match:/kerapid/i,src:"Kerafiber-työohje",data:["Erittäin nopea kiinnityslaasti, saumattavissa jopa 2–4 h kuluttua. C2FTES1."],params:{laasti_kiinnitys:"Kiilto Kerapid DF (C2FTES1)"},checks:[]},
+ floorfix:{name:"Kiilto Floorfix DF",match:/floorfix/i,src:"Kerafiber-työohje",data:["Notkea kiinnityslaasti isoille lattialaatoille. DF Rapid saumattavissa n. 5 h, DF n. 16 h kuluttua."],params:{laasti_kiinnitys:"Kiilto Floorfix DF (lattiat)"},checks:[]},
+ tilegrout:{name:"Kiilto Pro Tile grout",match:/pro\s*tile\s*grout/i,src:"Kerafiber-työohje",data:["Yleissaumalaasti seinien ja lattioiden kaakeli- ja klinkkerilaatoille. CG2."],params:{laasti_sauma:"Kiilto Pro Tile grout (CG2)"},checks:[]},
+ floorgrout:{name:"Kiilto Pro Floor Tile grout",match:/floor\s*tile\s*grout/i,src:"Kerafiber-työohje",data:["Nopea saumalaasti klinkkeri- ja kivilaatoille, sauma 2–12 mm. Ylimääräinen laasti pestään 15–30 min levityksestä nihkeällä sienellä."],params:{laasti_sauma:"Kiilto Pro Floor Tile grout (lattiat)"},checks:[]},
+ silicone:{name:"Kiilto Pro Sanitary Silicone / Pro Silicone E",match:/sanitary\s*silicone|silicone\s*e\b/i,src:"Kerafiber-työohje",data:["Homesuojattu silikoni liikuntasaumoihin, nurkkiin, seinä–lattialiittymiin ja läpivienteihin märkätiloissa."],params:{elast_massa:"Kiilto Pro Sanitary Silicone / Pro Silicone E"},checks:[]}
+};
+
+/* ===================== AINEISTON LUKU (pdf.js omana tiedostona) ===================== */
+let pdfjsLib=null;
+async function loadPdfjs(){
+  if(pdfjsLib)return pdfjsLib;
+  const base=new URL(".",document.baseURI||location.href);
+  pdfjsLib=await import(new URL("pdf.min.mjs",base).href);
+  pdfjsLib.GlobalWorkerOptions.workerSrc=new URL("pdf.worker.min.mjs",base).href;
+  return pdfjsLib;
+}
+const KEYWORDS=/märkätila|vedeneris|vesieris|kaivo|kallist|laatoit|laatta|primer|pohjust|kerafiber|ardulan|ardex|mapei|weber|kiilto|muovimatto|kynnys|läpivien|silikon|saumalaasti|kiinnityslaasti|tasoite|kosteus|sertifik|vahvike|nurkka|mallihuone|mallityö|pesuhuone|kylpyhuone|suihku|wc/gi;
+async function readFileForSetup(file,onProg){
+  const out={name:file.name,pages:[],images:[]};
+  if(/^image\//.test(file.type)){out.images.push({blob:file,label:file.name,prio:5});out.kind="kuva";return out}
+  if(!/pdf$/i.test(file.name)&&file.type!=="application/pdf"){out.pages.push({n:1,text:(await file.text()).slice(0,60000),score:5});out.kind="teksti";return out}
+  const lib=await loadPdfjs();
+  const doc=await lib.getDocument({data:new Uint8Array(await file.arrayBuffer())}).promise;
+  out.kind="pdf";out.numPages=doc.numPages;
+  for(let i=1;i<=doc.numPages;i++){
+    onProg&&onProg(`${file.name}: sivu ${i}/${doc.numPages}`);
+    const pg=await doc.getPage(i);const tc=await pg.getTextContent();
+    let t="";for(const it of tc.items){t+=(it.str||"")+(it.hasEOL?"\n":" ")}
+    t=t.replace(/[ \t]+/g," ").replace(/\n\s*\n+/g,"\n").trim();
+    const vp=pg.getViewport({scale:1});const big=Math.max(vp.width,vp.height)>1250;
+    const words=t.split(/\s+/).filter(Boolean).length;
+    const score=(t.match(KEYWORDS)||[]).length;
+    out.pages.push({n:i,text:t,score,words,big});
+    if(big||words<60){ // piirustus tai tekstitön sivu -> kuvaksi
+      const tiles=await renderPageTiles(pg,vp);
+      tiles.forEach((b,k)=>out.images.push({blob:b,label:`${file.name} s.${i}${tiles.length>1?" osa "+(k+1)+"/"+tiles.length:""}`,prio:(score>0?3:1)+(big?1:0)}));
+    }
+  }
+  return out;
+}
+async function renderPageTiles(pg,vp1){
+  const ar=Math.max(vp1.width,vp1.height)/Math.min(vp1.width,vp1.height);
+  const area=vp1.width*vp1.height;
+  let cols=1,rows=1;
+  if(ar>2.2){ if(vp1.width>vp1.height)cols=Math.ceil(ar/1.5); else rows=Math.ceil(ar/1.5) }
+  else if(area>1190*842*1.5){cols=2;rows=2}
+  const tileLong=1600;
+  const sc=Math.min(4,(tileLong*Math.max(cols,rows))/Math.max(vp1.width,vp1.height)*(cols*rows>1?1:1));
+  const vp=pg.getViewport({scale:sc});
+  const c=document.createElement("canvas");c.width=Math.floor(vp.width);c.height=Math.floor(vp.height);
+  const ctx=c.getContext("2d");ctx.fillStyle="#fff";ctx.fillRect(0,0,c.width,c.height);
+  await pg.render({canvasContext:ctx,canvas:c,viewport:vp}).promise;
+  const blobs=[];const tw=c.width/cols,th=c.height/rows;
+  for(let r=0;r<rows;r++)for(let k=0;k<cols;k++){
+    const t=document.createElement("canvas");t.width=Math.round(tw);t.height=Math.round(th);
+    t.getContext("2d").drawImage(c,k*tw,r*th,tw,th,0,0,t.width,t.height);
+    blobs.push(await new Promise(res=>t.toBlob(res,"image/jpeg",0.82)));
+  }
+  return blobs;
+}
+function detectProducts(text){const found=[];for(const id in PRODUCTS)if(PRODUCTS[id].match.test(text))found.push(id);return found}
+
+/* ===================== CLAUDE-TULKINTA ===================== */
+let sampleFn=null, sampleChecked=false;
+async function getSample(){if(sampleChecked)return sampleFn;sampleChecked=true;
+  try{sampleFn=window.claude&&claude.use?await claude.use("sample"):null}catch(e){sampleFn=null}return sampleFn}
+function buildPrompt(files,budget){
+  // tekstiosuus: pienet asiakirjat kokonaan, isoista relevantit sivut
+  let parts=[],used=0;
+  const all=[];
+  files.forEach(f=>f.pages.forEach(p=>all.push({f,p,pri:(f.pages.length<=8?100:0)+p.score*2+(p.n===1?6:0)})));
+  all.sort((a,b)=>b.pri-a.pri);
+  const chosen=new Set();
+  for(const x of all){if(!x.p.text)continue;if(x.pri<2&&x.f.pages.length>8)continue;
+    if(used+x.p.text.length>budget)continue;used+=x.p.text.length;chosen.add(x)}
+  files.forEach(f=>{const ps=[...chosen].filter(x=>x.f===f).map(x=>x.p).sort((a,b)=>a.n-b.n);
+    if(ps.length)parts.push(`=== TIEDOSTO: ${f.name} (${f.pages.length} s.) ===\n`+ps.map(p=>`--- sivu ${p.n} ---\n${p.text}`).join("\n"))});
+  const plist=PARAM_GROUPS.map(g=>g.params.map(([k,l,d,h])=>`${k} | ${l}${h?" ("+h+")":""}`).join("\n")).join("\n");
+  const prodList=Object.entries(PRODUCTS).map(([id,p])=>`${id}: ${p.name}`).join("\n");
+  return `Olet suomalainen rakennusvalvoja. Tehtäväsi on esitäyttää märkätilan (vedeneristys ja laatoitus) MALLIKATSELMUKSEN tarkastuslomake hankkeen asiakirjoista: suunnitelmat, työselostus, detaljit ja materiaalien työohjeet. Liitteenä voi olla myös kuvia piirustuksista.
+
+SÄÄNNÖT
+- Käytä vain asiakirjoista löytyvää tietoa. Jos arvoa ei löydy, jätä se pois. Älä keksi.
+- Vaatimusarvoissa (kallistukset, ylösnostot, limitykset, kynnys, vedeneristysalue, tartunta, korokerengas) ensisijainen on hankkeen suunnitelma / työselostus / detalji. Tuotekohtaiset arvot (kalvopaksuus, menekki, kuivumisajat, RH-raja, lämpötilat, pohjuste) materiaalin työohjeesta. Jos suunnitelma vaatii tiukempaa, käytä tiukempaa.
+- Kirjoita arvot lyhyesti suomeksi yksikköineen, esim. "100 mm", "1:100, kaivon ympärillä 1:50 (n. 500 mm)".
+- source = tiedoston nimi + sivu tai kohta, lyhyesti.
+- Kirjaa ristiriidat (esim. suunnitelmassa eri vedeneriste kuin toimitetussa työohjeessa, eri kallistusarvot eri asiakirjoissa) conflicts-listaan.
+- items: lisää 0–12 projektikohtaista tarkastuskohtaa, joita yleinen märkätilalista ei kata (esim. hankkeen erityiset detaljit, kynnysratkaisu, muovimaton ja sivelyeristeen liitos, kiinnikkeiden tiivistys, laattojen tartuntavaatimus). section on 0 (urakoitsijan ennakkoon toimitettavat asiakirjat) tai yksi kirjaimista A (asiakirjat), B (alusta), C (kaivo ja läpiviennit), D (vedeneristys), E (laatoitus), F (saumaus ja viimeistely). req = vaatimus / työohje lyhyesti, how = miten tarkastetaan.
+- products: listaa niiden tuotekirjaston tuotteiden tunnukset, joita hankkeessa todella käytetään (ei pelkkiä esimerkkimainintoja).
+
+TÄYTETTÄVÄT KENTÄT (avain | selite):
+${plist}
+
+PERUSTIEDOT (avaimet): hanke, osoite, tilaaja, urakoitsija
+
+TUOTEKIRJASTO (tunnus: nimi):
+${prodList}
+
+Vastaa VAIN JSON-oliona tässä muodossa:
+{"summary":"1–3 virkettä","info":{"hanke":{"value":"","source":""}},"params":{"avain":{"value":"","source":""}},"products":["tunnus"],"items":[{"section":"D","t":"","req":"","how":"","source":""}],"conflicts":["..."]}
+
+ASIAKIRJAT:
+${parts.join("\n\n")}`;
+}
+
+/* ===================== AINEISTO-VÄLILEHTI ===================== */
+let setupFiles=[];      // valitut File-oliot
+let setupState=null;    // {phase, msg, ctl}
+let pendingFill=null;   // tarkistettava ehdotus
+function renderAineisto(){
+  const docs=cur.docs||[];
+  let h=`<h2>Hankepaketti</h2><div class="card">
+   <p style="margin-top:0"><b>Esitäyttö Clauden avulla:</b> lähetä hankkeen suunnitelmat ja materiaalitiedot Claudelle ja pyydä "mallikatselmuksen hankepaketti". Tuo saamasi .json-tiedosto tästä – arvot, tuotteet, lisätarkastuskohdat ja ristiriidat tulevat hyväksyttäviksi.</p>
+   <label class="btn block filebtn">📦 Tuo hankepaketti (.json)<input type="file" id="pkgInput" accept=".json,application/json"></label></div>
+  <h2>Lähtöaineisto</h2><div class="card">
+   <p style="margin-top:0">Voit myös lukea <b>suunnitelmat</b> (työselostus, märkätiladetaljit, ovi- ja kynnysdetaljit, huoneselostus) ja <b>materiaalitiedot</b> (vedeneristeen, kaivon ja laastien työohjeet, sertifikaatit). Sovellus tunnistaa niistä tuotekirjaston tuotteet ja täyttää tuotetiedot. Muut projektiarvot tulevat hankepaketista tai täytetään käsin.</p>
+   ${webviewNote()}<label class="add big-add">📄 Valitse tiedostot (PDF tai kuva)<input type="file" id="setupInput" multiple accept="application/pdf,image/*,.pdf,.txt"></label>
+   <div id="setupList">${setupFiles.map((f,i)=>`<div class="frow"><span>📎 ${esc(f.name)} <span class="muted">${(f.size/1048576).toFixed(1)} Mt</span></span><button class="xbtn" data-rmfile="${i}">×</button></div>`).join("")}</div>
+   ${setupState&&setupState.phase==="run"?`<div class="runbox"><div class="spin"></div><div><b>${esc(setupState.msg||"")}</b><div class="muted">${esc(setupState.sub||"")}</div></div></div><button class="btn sec block" id="stopFill">Keskeytä</button>`:
+   `<button class="btn block" id="runFill" ${setupFiles.length?"":"disabled"}>Lue aineisto ja tunnista tuotteet</button>`}
+   ${setupState&&setupState.phase==="err"?`<div class="warnbox">${esc(setupState.msg)}</div>`:""}
+   ${!docs.length?`<button class="btn sec block" id="skipSetup">Ohita – täytän tiedot käsin</button>`:""}
+  </div>`;
+  if(docs.length){h+=`<h2>Luetut asiakirjat</h2><div class="card">`+docs.map(d=>`<div class="frow"><span>📄 ${esc(d.name)}</span><span class="muted">${esc(d.info||"")}</span></div>`).join("")+`</div>`}
+  if(cur.notes&&cur.notes.length){h+=`<h2>Havaitut ristiriidat ja huomiot</h2><div class="card warnlist">`+cur.notes.map(n=>`<div>⚠️ ${esc(n)}</div>`).join("")+`</div>`}
+  h+=`<h2>Kuvatoiminnon testi</h2><details class="card"><summary><b>Testaa kuvien lisäys tällä laitteella</b></summary>
+   <p class="muted">Kokeile alla olevia tapoja. Loki näyttää, avautuiko valitsin ja saatiinko kuva. Kerro tulos tarvittaessa.</p>
+   <div class="ph"><button type="button" class="add" data-testpick="cam">1. Kamera</button><button type="button" class="add" data-testpick="gal">2. Galleria</button></div>
+   <div style="margin-top:8px;font-size:14px">3. Perusvalintakenttä:</div><input type="file" accept="image/*" id="testNative" class="native">
+   <div class="diag" id="diagLog">${esc(diagLines.join("\n"))||"(loki tyhjä)"}</div>
+   <div class="muted" style="margin-top:6px">Selain: ${esc(navigator.userAgent)}</div></details>`;
+  // tuotteet
+  const prods=cur.products||[];
+  h+=`<h2>Hankkeen tuotteet</h2>`;
+  if(prods.length)h+=prods.map(id=>{const p=PRODUCTS[id];if(!p)return"";return `<details class="card prod"><summary><b>${esc(p.name)}</b><button class="xbtn" data-rmprod="${id}" title="Poista">×</button></summary><ul>${p.data.map(x=>`<li>${esc(x)}</li>`).join("")}</ul><div class="ref">Lähde: ${esc(p.src)}</div></details>`}).join("");
+  else h+=`<div class="card muted">Ei tuotteita vielä. Ne tunnistetaan aineistosta, tai lisää alta.</div>`;
+  h+=`<div class="card"><b style="font-size:14px">Lisää tuote kirjastosta</b><div class="chips">${Object.entries(PRODUCTS).filter(([id])=>!prods.includes(id)).map(([id,p])=>`<button class="chip" data-addprod="${id}">+ ${esc(p.name)}</button>`).join("")}</div>
+   <p class="muted" style="margin-bottom:0">Tuotteen lisääminen täyttää tyhjät projektiarvot tuotetiedoista ja lisää tuotteen omat tarkastuskohdat.</p></div>`;
+  main.innerHTML=h;
+}
+
+function applyProducts(ids,opts){
+  opts=opts||{};cur.products=cur.products||[];const filled=[];
+  const batch={};
+  for(const id of ids){const p=PRODUCTS[id];if(!p)continue;
+    if(!cur.products.includes(id))cur.products.push(id);
+    for(const k in p.params){const v=p.params[k];
+      if(batch[k]&&!batch[k].includes(v)){batch[k]+=" / "+v}else if(!batch[k])batch[k]=v}
+    p.checks.forEach((c,i)=>{const iid=`${c.sec}-${id}${i+1}`;const list=cur.custom[c.sec]=cur.custom[c.sec]||[];
+      if(!list.some(x=>x.id===iid))list.push({id:iid,t:c.t,req:c.req,how:c.how,ref:"Tuote: "+p.name+" – "+p.src})});
+  }
+  for(const k in batch){if(opts.overwrite||!(cur.params[k]||"").trim()||isDefault(k)){cur.params[k]=batch[k];filled.push(k)}}
+  return filled;
+}
+function isDefault(k){for(const g of PARAM_GROUPS)for(const p of g.params)if(p[0]===k)return (cur.params[k]||"")===p[2]&&p[2]!=="";return false}
+function removeProduct(id){cur.products=(cur.products||[]).filter(x=>x!==id);
+  for(const s in cur.custom)cur.custom[s]=cur.custom[s].filter(i=>!i.id.startsWith(s+"-"+id))}
+
+async function runFill(){
+  const ctl=new AbortController();setupState={phase:"run",msg:"Luetaan tiedostoja…",ctl};renderAineisto();
+  const upd=(m,sub)=>{setupState.msg=m;setupState.sub=sub||"";const rb=document.querySelector(".runbox");if(rb&&tab==="aineisto")rb.innerHTML=`<div class="spin"></div><div><b>${esc(m)}</b><div class="muted">${esc(sub||"")}</div></div>`};
+  const files=[];
+  try{
+    for(const f of setupFiles){if(ctl.signal.aborted)throw{code:"cancelled"};files.push(await readFileForSetup(f,s=>upd("Luetaan tiedostoja…",s)))}
+  }catch(e){if(e&&e.code==="cancelled"){setupState=null;renderAineisto();return}
+    setupState={phase:"err",msg:"Tiedoston lukeminen epäonnistui ("+(e&&e.message||e)+"). Kokeile toista tiedostoa tai kuvaa."};renderAineisto();return}
+  const allText=files.map(f=>f.pages.map(p=>p.text).join("\n")).join("\n");
+  const detected=detectProducts(allText);
+  const docsInfo=files.map(f=>({name:f.name,info:f.kind==="pdf"?`${f.numPages} s.`:f.kind}));
+  const sample=await getSample();
+  let ai=null,aiErr="";
+  if(sample){
+    let imgs=files.flatMap(f=>f.images).sort((a,b)=>b.prio-a.prio);
+    let maxImg=0;try{const lim=await sample.limits();maxImg=lim.images?Math.min(lim.images.maxCount,16):0}catch(e){}
+    imgs=imgs.slice(0,maxImg);
+    let budget=150000,prompt="";
+    for(let k=0;k<5;k++){prompt=buildPrompt(files,budget);if(new TextEncoder().encode(prompt).length<235000)break;budget=Math.round(budget*0.7)}
+    prompt=prompt+(imgs.length?`\n\nKUVAT (järjestyksessä): ${imgs.map(i=>i.label).join("; ")}`:"");
+    upd("Claude tulkitsee aineistoa…","Tämä kestää yleensä 1–3 minuuttia. Voit pitää sivun auki.");
+    try{
+      ai=await sample.json(prompt,{signal:ctl.signal,images:imgs.length?imgs.map(i=>i.blob):undefined,modelTier:"default",
+        onText:()=>upd("Claude kirjoittaa ehdotusta…","Melkein valmista.")});
+    }catch(e){
+      if(e&&e.code==="cancelled"){setupState=null;renderAineisto();return}
+      if(e&&e.code==="images_unavailable"||e&&e.code==="image_rejected"){
+        try{ai=await sample.json(buildPrompt(files,budget),{signal:ctl.signal,modelTier:"default"})}catch(e2){aiErr=errText(e2)}}
+      else aiErr=errText(e);
+    }
+  }else aiErr="";
+  // kokoa ehdotus
+  const prop={docs:docsInfo,summary:"",info:{},params:{},products:[],items:[],conflicts:[],aiErr,fromLibrary:!ai};
+  if(ai&&typeof ai==="object"){
+    prop.summary=String(ai.summary||"");
+    for(const k of ["hanke","osoite","tilaaja","urakoitsija"]){const v=ai.info&&ai.info[k];if(v&&(v.value||typeof v==="string"))prop.info[k]={value:String(v.value??v),source:String(v.source||""),on:!(cur.info[k]||"").trim()}}
+    const keys=new Set();PARAM_GROUPS.forEach(g=>g.params.forEach(p=>keys.add(p[0])));
+    for(const k in (ai.params||{})){if(!keys.has(k))continue;const v=ai.params[k];const val=String(v&&v.value!=null?v.value:v||"").trim();if(!val)continue;
+      prop.params[k]={value:val,source:String(v.source||""),on:true}}
+    (Array.isArray(ai.products)?ai.products:[]).forEach(id=>{if(PRODUCTS[id])prop.products.push(id)});
+    (Array.isArray(ai.items)?ai.items:[]).forEach(it=>{const sec=String(it.section||"").toUpperCase().replace(/^O$/,"0");if(!SECTIONS.some(s=>s.id===sec)||!it.t)return;
+      prop.items.push({sec,t:String(it.t),req:String(it.req||""),how:String(it.how||""),source:String(it.source||""),on:true})});
+    prop.conflicts=(Array.isArray(ai.conflicts)?ai.conflicts:[]).map(String).filter(Boolean);
+  }
+  // tuotekirjaston tunnistus täydentää
+  const prodSet=new Set(prop.products);
+  prop.productChoices=Object.keys(PRODUCTS).filter(id=>prodSet.has(id)||detected.includes(id)).map(id=>({id,on:prodSet.has(id)||(!ai&&PRODUCTS[id].core),ai:prodSet.has(id)}));
+  pendingFill=prop;setupState=null;
+  if(!ai&&!prop.productChoices.length){setupState={phase:"err",msg:(aiErr?aiErr+" ":"")+"Aineistosta ei tunnistettu tuotteita – täytä arvot Tiedot-välilehdellä."};cur.docs=(cur.docs||[]).concat(docsInfo);save();renderAineisto();return}
+  showReview();
+}
+function errText(e){const c=e&&e.code;return {not_granted:"Claude-tulkinnalle ei annettu lupaa.",rate_limited:"Claude on hetkellisesti ruuhkautunut tai käyttöraja täynnä – yritä hetken päästä.",prompt_too_large:"Aineisto on liian suuri kerralla – lataa vähemmän tiedostoja kerrallaan.",invalid_json:"Tulkinta ei palauttanut luettavaa tulosta – yritä uudelleen.",sampling_disabled:"Claude ei ole käytettävissä tällä tilillä.",session_expired:"Kirjaudu uudelleen sisään."}[c]||"Tulkinta epäonnistui ("+(c||"virhe")+")."}
+
+function showReview(){
+  const p=pendingFill;
+  const row=(kind,k,label,o,cur0)=>`<div class="prow"><label class="pchk"><input type="checkbox" data-pk="${kind}|${k}" ${o.on?"checked":""}></label><div class="pbody"><div class="plabel">${esc(label)}</div>
+    <input type="text" data-pv="${kind}|${k}" value="${esc(o.value)}">${cur0&&cur0!==o.value?`<div class="muted">Nykyinen: ${esc(cur0)}</div>`:""}${o.source?`<div class="ref">Lähde: ${esc(o.source)}</div>`:""}</div></div>`;
+  let h=`<div class="rv-head"><b style="font-size:18px">Tarkista esitäyttö</b><button class="xbtn" id="rvClose">×</button></div>`;
+  if(p.aiErr)h+=`<div class="warnbox">${esc(p.aiErr)}</div>`;
+  if(p.fromLibrary)h+=`<p class="muted">Aineistosta tunnistetut tuotekirjaston tuotteet. Valitut tuotteet täyttävät tyhjät kentät tuotetiedoista.</p>`;
+  if(p.summary)h+=`<p>${esc(p.summary)}</p>`;
+  if(p.conflicts.length)h+=`<div class="rv-sec">Ristiriidat ja huomiot</div><div class="warnlist">${p.conflicts.map(c=>`<div>⚠️ ${esc(c)}</div>`).join("")}</div><label class="pchk2"><input type="checkbox" id="rvConf" checked> Kirjaa huomioiksi (Aineisto ja kohta A1)</label>`;
+  const infoKeys=Object.keys(p.info);
+  if(infoKeys.length){h+=`<div class="rv-sec">Perustiedot</div>`;infoKeys.forEach(k=>{const lbl=(INFO_FIELDS.find(f=>f[0]===k)||[k,k])[1];h+=row("info",k,lbl,p.info[k],cur.info[k])})}
+  const pk=Object.keys(p.params);
+  if(pk.length){h+=`<div class="rv-sec">Projektikohtaiset arvot (${pk.length})</div>`;
+    PARAM_GROUPS.forEach(g=>g.params.forEach(([k,l])=>{if(p.params[k])h+=row("param",k,l,p.params[k],cur.params[k])}))}
+  if(p.productChoices.length){h+=`<div class="rv-sec">Tuotteet</div><p class="muted" style="margin:0 0 6px">Valitut tuotteet täyttävät tyhjät kentät tuotetiedoista ja lisäävät tuotteen tarkastuskohdat.${p.aiErr?" Ohjeessa vain esimerkkeinä mainitut laastit on jätetty valitsematta.":""}</p>`+
+    p.productChoices.map(c=>`<label class="prow"><span class="pchk"><input type="checkbox" data-prod="${c.id}" ${c.on?"checked":""}></span><span class="pbody"><b>${esc(PRODUCTS[c.id].name)}</b>${c.ai?' <span class="pill ok">hankkeessa</span>':' <span class="pill ek">mainittu</span>'}</span></label>`).join("")}
+  if(p.items.length){h+=`<div class="rv-sec">Lisätarkastuskohdat (${p.items.length})</div>`+p.items.map((it,i)=>`<label class="prow"><span class="pchk"><input type="checkbox" data-itm="${i}" ${it.on?"checked":""}></span><span class="pbody"><b>${it.sec}: ${esc(it.t)}</b><div style="font-size:14px">${esc(it.req)}</div>${it.source?`<div class="ref">Lähde: ${esc(it.source)}</div>`:""}</span></label>`).join("")}
+  h+=`<div class="rv-foot"><button class="btn sec" id="rvCancel">Peruuta</button><button class="btn" id="rvApply">Hyväksy valitut</button></div>`;
+  openModal(h);document.getElementById("modal").classList.add("full");
+}
+function applyReview(){
+  const p=pendingFill;const box=document.getElementById("modalBox");
+  box.querySelectorAll("[data-pk]").forEach(ch=>{const [kind,k]=ch.dataset.pk.split("|");const val=box.querySelector(`[data-pv="${kind}|${k}"]`).value.trim();
+    if(!ch.checked||!val)return; if(kind==="info")cur.info[k]=val;else cur.params[k]=val});
+  const prods=[...box.querySelectorAll("[data-prod]")].filter(c=>c.checked).map(c=>c.dataset.prod);
+  applyProducts(prods); // täyttää vain tyhjät / oletusarvoiset
+  box.querySelectorAll("[data-itm]").forEach(ch=>{if(!ch.checked)return;const it=p.items[+ch.dataset.itm];const list=cur.custom[it.sec]=cur.custom[it.sec]||[];
+    const id=it.sec+"-p"+uid().slice(-4);list.push({id,t:it.t,req:it.req,how:it.how,ref:it.source?"Projekti: "+it.source:"Projektikohtainen"})});
+  const conf=document.getElementById("rvConf");
+  if(p.conflicts.length&&conf&&conf.checked){cur.notes=(cur.notes||[]).concat(p.conflicts);
+    const r=cur.items.A1=cur.items.A1||{};r.n=((r.n?r.n+"\n":"")+p.conflicts.map(c=>"⚠ "+c).join("\n"));if(!r.s)r.s="huom"}
+  cur.docs=(cur.docs||[]).concat(p.docs);
+  pendingFill=null;setupFiles=[];closeModal();save();tab="tiedot";render();window.scrollTo(0,0);
+  toast("Esitäyttö tehty – tarkista arvot");
+}
+
+
+/* ===================== tila ===================== */
+let index = [];          // [{id,name,updatedAt}]
+let cur = null;          // avoin katselmus
+let view = "home", tab = "tarkastus";
+let openSecs = new Set(["0"]);
+const thumbCache = {};   // photoId -> dataURL
+
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function esc(s){return String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function today(){const d=new Date();return d.toISOString().slice(0,10)}
+function fmtDate(s){if(!s)return"";const [y,m,d]=s.split("-");return d?`${+d}.${+m}.${y}`:s}
+function toast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("on");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("on"),2600)}
+
+function newInspection(copyFrom){
+  const p={};PARAM_GROUPS.forEach(g=>g.params.forEach(([k,,d])=>p[k]=d));
+  const o={id:uid(),kind:"mallikatselmus",createdAt:Date.now(),updatedAt:Date.now(),
+    info:{pvm:today()},params:p,items:{},custom:{},decision:"",korjaukset:"",jatko:"",photos:{},docs:[],products:[],notes:[]};
+  if(copyFrom){
+    o.info=Object.assign({},copyFrom.info,{tila:"",pvm:today(),lasna:copyFrom.info.lasna||""});
+    o.params=Object.assign({},copyFrom.params);
+    o.custom=JSON.parse(JSON.stringify(copyFrom.custom||{}));
+    o.docs=(copyFrom.docs||[]).slice();o.products=(copyFrom.products||[]).slice();o.notes=(copyFrom.notes||[]).slice();
+  }
+  return o;
+}
+function nameOf(o){return [o.info.hanke,o.info.tila].filter(Boolean).join(" – ")||"Nimetön katselmus"}
+
+/* ===================== tallennus: laite ===================== */
+const LS={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},
+          set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}},
+          del(k){try{localStorage.removeItem(k)}catch(e){}}};
+let idb=null;
+function idbOpen(){return new Promise(res=>{try{const r=indexedDB.open("mallikatselmus",1);
+  r.onupgradeneeded=()=>r.result.createObjectStore("photos",{keyPath:"id"});
+  r.onsuccess=()=>{idb=r.result;res(idb)};r.onerror=()=>res(null)}catch(e){res(null)}})}
+function idbPut(rec){return new Promise(res=>{if(!idb){thumbCache[rec.id]=rec.data;return res()}
+  try{const tx=idb.transaction("photos","readwrite");tx.objectStore("photos").put(rec);tx.oncomplete=()=>res();tx.onerror=()=>res()}catch(e){res()}})}
+function idbGet(id){return new Promise(res=>{if(!idb)return res(thumbCache[id]?{id,data:thumbCache[id]}:null);
+  try{const r=idb.transaction("photos").objectStore("photos").get(id);r.onsuccess=()=>res(r.result||null);r.onerror=()=>res(null)}catch(e){res(null)}})}
+function idbDel(id){return new Promise(res=>{delete thumbCache[id];if(!idb)return res();
+  try{const tx=idb.transaction("photos","readwrite");tx.objectStore("photos").delete(id);tx.oncomplete=()=>res();tx.onerror=()=>res()}catch(e){res()}})}
+
+/* ===================== tallennus: pilvi (db) ===================== */
+let db=null, me=null, cloud="off"; // off | wait | ok | err
+function setSync(s){cloud=s;const el=document.getElementById("sync");
+  el.textContent={off:"💾 tallennettu laitteelle",wait:"⟳ yhdistetään…",ok:"☁︎ tallennettu",err:"💾 vain laitteella",saving:"☁︎ tallennetaan…"}[s]||""}
+const writing={}, dirty={};
+async function cloudWrite(path,body){ // yksi kirjoitus kerrallaan per dokumentti
+  if(!db||!me)return;
+  if(writing[path]){dirty[path]=body;return}
+  writing[path]=true;
+  try{await db.doc(path).set(body);if(cloud!=="err")setSync("ok")}
+  catch(e){ if(e&&e.code==="quota_exceeded"){toast("Pilvitallennus täynnä – tiedot säilyvät laitteella")} setSync("err") }
+  writing[path]=false;
+  if(dirty[path]){const b=dirty[path];delete dirty[path];cloudWrite(path,b)}
+}
+function inspPath(id){return "data/users/"+me+"/"+id}
+async function cloudInit(){
+  if(!window.claude||!claude.use){setSync("off");return}
+  setSync("wait");
+  const timer=setTimeout(()=>{if(cloud==="wait")setSync("err")},10000);
+  try{
+    const [d,u]=await Promise.all([claude.use("db"),claude.use("user")]);
+    if(!d||!u){clearTimeout(timer);setSync("off");return}
+    const id=await u.id(); if(!id){clearTimeout(timer);setSync("off");return}
+    db=d;me=id;
+    const snap=await db.collection("data/users/"+me).where("kind","==","mallikatselmus").get();
+    clearTimeout(timer);
+    const remote={};snap.docs.forEach(s=>{if(s.exists)remote[s.id]=s.data()});
+    // yhdistä: uudempi voittaa
+    for(const rid in remote){
+      const r=remote[rid];const l=LS.get("mk_"+rid);
+      if(!l||(r.updatedAt||0)>(l.updatedAt||0)){LS.set("mk_"+rid,JSON.parse(JSON.stringify(r)))}
+    }
+    for(const m of index){const l=LS.get("mk_"+m.id);if(l&&(!remote[m.id]||(l.updatedAt||0)>(remote[m.id].updatedAt||0)))cloudWrite(inspPath(m.id),l)}
+    rebuildIndex(Object.keys(remote));
+    setSync("ok");
+    if(cur){const fresh=LS.get("mk_"+cur.id);if(fresh&&fresh.updatedAt>cur.updatedAt)cur=fresh;syncPhotos(cur)}
+    render();
+  }catch(e){clearTimeout(timer);setSync("err")}
+}
+async function syncPhotos(o){
+  if(!db||!me)return;
+  try{
+    const col=db.doc(inspPath(o.id)).collection("photos");
+    const snap=await col.get();const remote=new Set();
+    for(const s of snap.docs){if(!s.exists)continue;remote.add(s.id);
+      const have=await idbGet(s.id);if(!have){const d=s.data();await idbPut({id:s.id,data:d.data})}}
+    // lähetä puuttuvat
+    for(const itemId in o.photos)for(const pid of o.photos[itemId]){
+      if(!remote.has(pid)){const r=await idbGet(pid);if(r){try{await col.doc(pid).set({itemId,data:r.data})}catch(e){if(e&&e.code==="quota_exceeded"){toast("Kuvien pilvitila täynnä – kuvat säilyvät laitteella");return}}}}
+    }
+    if(view==="insp")render();
+  }catch(e){}
+}
+
+/* ===================== tallennuslogiikka ===================== */
+function rebuildIndex(extraIds){
+  const ids=new Set((LS.get("mk_index")||[]).map(x=>x.id));(extraIds||[]).forEach(i=>ids.add(i));if(cur&&cur.id)ids.add(cur.id);
+  index=[];ids.forEach(id=>{const o=LS.get("mk_"+id);if(o)index.push({id,name:nameOf(o),updatedAt:o.updatedAt,o})});
+  index.sort((a,b)=>b.updatedAt-a.updatedAt);
+  LS.set("mk_index",index.map(({id,name,updatedAt})=>({id,name,updatedAt})));
+}
+let saveT=null;
+function save(){
+  if(!cur)return;cur.updatedAt=Date.now();
+  const ok=LS.set("mk_"+cur.id,cur);
+  if(!ok&&!db)document.getElementById("sync").textContent="⚠ ei tallennusta";
+  clearTimeout(saveT);if(db)setSync("saving");
+  saveT=setTimeout(()=>{rebuildIndex();cloudWrite(inspPath(cur.id),JSON.parse(JSON.stringify(cur)))},1200);
+  updateProgress();
+}
+
+/* ===================== apurit ===================== */
+function fill(text,params){
+  return esc(text).replace(/\{(\w+)\}/g,(m,k)=>{const v=(params||{})[k];
+    return v&&String(v).trim()?`<span class="pv">${esc(v)}</span>`:`<span class="pv miss">${esc(paramLabel(k))} puuttuu</span>`});
+}
+function fillPlain(text,params){let t=String(text).replace(/\{(\w+)\}/g,(m,k)=>{const v=(params||{})[k];return v&&String(v).trim()?v:"\u0000"});
+  // puuttuvat arvot pois siististi
+  t=t.replace(/\s*\(\s*\u0000\s*\)/g,"").replace(/:\s*\u0000\s*\./g,".").replace(/\s*\u0000\s*,/g,",").replace(/\u0000/g,"").replace(/\s+([.,;])/g,"$1").replace(/,\s*\./g,".").replace(/\s{2,}/g," ");
+  return t.trim()}
+function paramLabel(k){for(const g of PARAM_GROUPS)for(const p of g.params)if(p[0]===k)return p[1];return k}
+function numOf(o,sec,it){const list=[...sec.items,...((o.custom||{})[sec.id]||[])];const i=list.findIndex(x=>x.id===it.id);return sec.id==="0"?"0."+(i+1):sec.id+(i+1)}
+function stLabel(sec,v,long){if(sec&&sec.labels&&sec.labels[v])return sec.labels[v];return (long?ST_LONG:ST)[v]||v}
+function allItems(o){const out=[];SECTIONS.forEach(s=>{s.items.forEach(i=>out.push([s,i]));((o.custom||{})[s.id]||[]).forEach(i=>out.push([s,i]))});return out}
+function stats(o){const c={ok:0,huom:0,puute:0,ek:0,none:0};allItems(o).forEach(([s,i])=>{const v=(o.items[i.id]||{}).s;c[v||"none"]++});c.total=allItems(o).length;c.done=c.total-c.none;return c}
+function updateProgress(){if(!cur)return;const c=stats(cur);document.getElementById("progBar").style.width=(100*c.done/c.total)+"%"}
+
+/* ===================== kuvat ===================== */
+function compress(file){return new Promise((res,rej)=>{const url=URL.createObjectURL(file);{const img=new Image();img.onload=()=>{URL.revokeObjectURL(url);
+  let max=1280,q=0.62,data;
+  for(let i=0;i<4;i++){const sc=Math.min(1,max/Math.max(img.width,img.height));const c=document.createElement("canvas");
+    c.width=Math.round(img.width*sc);c.height=Math.round(img.height*sc);c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+    data=c.toDataURL("image/jpeg",q);if(data.length<220000)break;max=Math.round(max*0.8);q=Math.max(0.45,q-0.06)}
+  res(data)};img.onerror=e=>{URL.revokeObjectURL(url);rej(e)};img.src=url}})}
+async function addPhotos(itemId,files){
+  const busy=document.querySelector(`[data-phbusy="${itemId}"]`);if(busy)busy.textContent="Käsitellään kuvaa…";
+  let added=0;
+  for(const f of files){try{const data=await compress(f);added++;const pid="p"+uid();
+    await idbPut({id:pid,data});thumbCache[pid]=data;
+    (cur.photos[itemId]=cur.photos[itemId]||[]).push(pid);
+    if(db&&me){db.doc(inspPath(cur.id)).collection("photos").doc(pid).set({itemId,data}).catch(e=>{if(e&&e.code==="quota_exceeded")toast("Kuvien pilvitila täynnä – kuva säilyy laitteella")})}
+  }catch(e){toast("Kuvan lukeminen epäonnistui ("+(f.type||"tuntematon tyyppi")+")")}}
+  if(busy)busy.textContent="";if(added)toast(added>1?added+" kuvaa lisätty":"Kuva lisätty");
+  save();renderItemPhotos(itemId);
+}
+async function delPhoto(itemId,pid){
+  cur.photos[itemId]=(cur.photos[itemId]||[]).filter(x=>x!==pid);await idbDel(pid);
+  if(db&&me)db.doc(inspPath(cur.id)).collection("photos").doc(pid).delete().catch(()=>{});
+  save();renderItemPhotos(itemId);
+}
+async function photoData(pid){if(thumbCache[pid])return thumbCache[pid];const r=await idbGet(pid);if(r){thumbCache[pid]=r.data;return r.data}return null}
+async function renderItemPhotos(itemId){
+  const box=document.querySelector(`[data-ph="${itemId}"]`);if(!box)return;
+  const ids=(cur.photos[itemId]||[]);
+  let h="";for(const pid of ids){const d=await photoData(pid);
+    h+=`<div class="thumb">${d?`<img src="${d}" data-big="${pid}" alt="">`:`<span class="muted" style="font-size:11px;padding:4px;display:block">ladataan…</span>`}<button data-delph="${pid}" data-item="${itemId}" aria-label="Poista kuva">×</button></div>`}
+  box.innerHTML=h;
+}
+
+/* ===================== kuvanvalitsin (ohjelmallinen) ===================== */
+const STANDALONE=true;
+const APP_URL=location.href.split("#")[0];
+const IN_APP_WEBVIEW=/; wv\)|\bwv\b.*Android|Android.*Version\/[\d.]+.*Chrome\/[\d.]+ Mobile/.test(navigator.userAgent)&&/Android/.test(navigator.userAgent);
+function webviewNote(){return IN_APP_WEBVIEW?`<div class="wvnote">⚠️ Tämä näkymä ei salli kuvien valintaa. Avaa sovellus <b>Chrome-selaimessa</b> tai asennettuna kotinäytöltä.<br><button type="button" class="btn sec" data-copylink style="margin-top:6px;padding:8px 12px">Kopioi linkki</button> <span class="muted">${APP_URL}</span></div>`:""}
+const diagLines=[];
+function diag(m){const t=new Date().toLocaleTimeString("fi-FI");diagLines.push(t+" "+m);if(diagLines.length>40)diagLines.shift();const el=document.getElementById("diagLog");if(el){el.textContent=diagLines.join("\n");el.scrollTop=1e6}}
+window.addEventListener("blur",()=>diag("ikkuna menetti fokuksen (valitsin todennäköisesti avautui)"));
+window.addEventListener("focus",()=>diag("ikkuna sai fokuksen takaisin"));
+function pickImages(mode,onFiles){
+  const inp=document.createElement("input");inp.type="file";inp.dataset.dyn="1";inp.accept="image/*";
+  if(mode==="cam")inp.setAttribute("capture","environment");else inp.multiple=true;
+  inp.style.cssText="position:fixed;left:0;bottom:0;width:2px;height:2px;opacity:0.01;z-index:-1";
+  document.body.appendChild(inp);
+  inp.addEventListener("change",()=>{diag("change: "+inp.files.length+" tiedosto(a) "+[...inp.files].map(f=>f.name+" "+Math.round(f.size/1024)+"kt "+(f.type||"?")).join(", "));
+    const fs=[...inp.files];inp.remove();if(fs.length)onFiles(fs)});
+  inp.addEventListener("cancel",()=>{diag("valinta peruttiin");inp.remove()});
+  try{diag("avataan valitsin ("+(mode==="cam"?"kamera":"galleria")+")…");
+    if(typeof inp.showPicker==="function"){try{inp.showPicker();diag("showPicker kutsuttu");return}catch(e){diag("showPicker ei käy: "+(e&&e.name))}}
+    inp.click();diag("input.click kutsuttu");
+  }catch(e){diag("virhe: "+(e&&e.message));toast("Kuvanvalitsin ei avautunut – kokeile varatapaa")}
+}
+
+/* ===================== hankepaketti, varmuuskopio ===================== */
+function installHint(){
+  const standaloneMode=matchMedia("(display-mode: standalone)").matches||navigator.standalone;
+  return standaloneMode?"Sovellus on asennettu kotinäytölle.":"Vinkki: asenna sovellus Chromen ⋮-valikosta → Asenna sovellus / Lisää aloitusnäytölle. Toimii myös ilman verkkoyhteyttä.";
+}
+function readJSONFile(f){return f.text().then(t=>JSON.parse(t))}
+async function importPackage(file,asNew){
+  let pkg;try{pkg=await readJSONFile(file)}catch(e){toast("Tiedostoa ei voitu lukea hankepaketiksi");return}
+  if(!pkg||typeof pkg!=="object"||!(pkg.params||pkg.info||pkg.items)){toast("Tiedosto ei ole mallikatselmuksen hankepaketti");return}
+  if(asNew||!cur){cur=newInspection();save();rebuildIndex();view="insp";tab="aineisto";render()}
+  const val=v=>v&&typeof v==="object"?String(v.value??""):String(v??"");
+  const src=v=>v&&typeof v==="object"?String(v.source||""):"";
+  const prop={docs:(pkg.docs||[]).map(d=>typeof d==="string"?{name:d,info:"hankepaketti"}:{name:String(d.name||""),info:String(d.info||"")}),
+    summary:String(pkg.summary||("Hankepaketti: "+file.name)),info:{},params:{},products:[],items:[],conflicts:[],aiErr:"",fromLibrary:false};
+  for(const k in (pkg.info||{})){const v=val(pkg.info[k]).trim();if(v&&INFO_FIELDS.some(f=>f[0]===k))prop.info[k]={value:v,source:src(pkg.info[k]),on:true}}
+  const keys=new Set();PARAM_GROUPS.forEach(g=>g.params.forEach(p=>keys.add(p[0])));
+  for(const k in (pkg.params||{})){if(!keys.has(k))continue;const v=val(pkg.params[k]).trim();if(v)prop.params[k]={value:v,source:src(pkg.params[k]),on:true}}
+  (pkg.products||[]).forEach(id=>{if(PRODUCTS[id])prop.products.push(id)});
+  (pkg.items||[]).forEach(it=>{const sec=String(it.section||"").toUpperCase().replace(/^O$/,"0");if(!SECTIONS.some(s=>s.id===sec)||!it.t)return;
+    prop.items.push({sec,t:String(it.t),req:String(it.req||""),how:String(it.how||""),source:String(it.source||""),on:true})});
+  prop.conflicts=(pkg.conflicts||[]).map(String).filter(Boolean);
+  prop.productChoices=prop.products.map(id=>({id,on:true,ai:true}));
+  pendingFill=prop;showReview();
+}
+async function allPhotosOf(o){const out={};for(const k in (o.photos||{}))for(const pid of o.photos[k]){const d=await photoData(pid);if(d)out[pid]=d}return out}
+async function doBackup(){
+  const note=document.getElementById("bkNote");if(note)note.textContent="Kootaan varmuuskopiota…";
+  const list=[];for(const m of index){const o=LS.get("mk_"+m.id);if(o)list.push({inspection:o,photos:await allPhotosOf(o)})}
+  const data=JSON.stringify({format:"mallikatselmus-varmuuskopio",version:1,created:new Date().toISOString(),items:list});
+  const ok=await saveFile("Mallikatselmus varmuuskopio "+today()+".json",new Blob([data],{type:"application/json"}));
+  if(note)note.textContent=ok?`Varmuuskopio tallennettu (${list.length} katselmusta, ${(data.length/1048576).toFixed(1)} Mt).`:"Tallennus peruttiin.";
+}
+async function doRestore(file){
+  let b;try{b=await readJSONFile(file)}catch(e){toast("Varmuuskopiota ei voitu lukea");return}
+  if(!b||b.format!=="mallikatselmus-varmuuskopio"||!Array.isArray(b.items)){toast("Tiedosto ei ole mallikatselmuksen varmuuskopio");return}
+  let n=0;for(const x of b.items){const o=x.inspection;if(!o||!o.id)continue;const have=LS.get("mk_"+o.id);
+    if(have&&(have.updatedAt||0)>=(o.updatedAt||0))continue;
+    for(const pid in (x.photos||{})){await idbPut({id:pid,data:x.photos[pid]});thumbCache[pid]=x.photos[pid]}
+    LS.set("mk_"+o.id,o);n++}
+  const ids=new Set((LS.get("mk_index")||[]).map(x=>x.id));b.items.forEach(x=>x.inspection&&ids.add(x.inspection.id));
+  LS.set("mk_index",[...ids].map(id=>({id})));rebuildIndex();render();toast(n?`${n} katselmusta palautettu`:"Ei uudempia katselmuksia palautettavana");
+}
+
+/* ===================== näkymät ===================== */
+const main=document.getElementById("main");
+function render(){
+  const tabs=document.getElementById("tabs");
+  if(view==="home"){tabs.style.display="none";document.getElementById("hdrTitle").innerHTML='Mallikatselmus<small>Märkätilat – vedeneristys ja laatoitus</small>';document.getElementById("progBar").style.width="0";return renderHome()}
+  tabs.style.display="flex";[...tabs.children].forEach(b=>b.classList.toggle("on",b.dataset.t===tab));
+  document.getElementById("hdrTitle").innerHTML=esc(nameOf(cur))+`<small>${fmtDate(cur.info.pvm)||"Märkätilan mallikatselmus"}</small>`;
+  updateProgress();
+  if(tab==="aineisto")renderAineisto();else if(tab==="tiedot")renderInfo();else if(tab==="yhteenveto")renderSummary();else renderCheck();
+}
+
+function renderHome(){
+  rebuildIndex();
+  let h=`<h2>Katselmukset</h2>`;
+  if(!index.length)h+=`<div class="card muted">Ei vielä katselmuksia. Aloita uusi alta.</div>`;
+  index.forEach(m=>{const c=stats(m.o);
+    h+=`<div class="card"><div class="insp"><div class="meta"><b>${esc(m.name)}</b>
+      <div class="muted">${fmtDate(m.o.info.pvm)} · ${c.done}/${c.total} tarkastettu</div>
+      <div class="sumrow">${c.puute?`<span class="pill puute">${c.puute} puutetta</span>`:""}${c.huom?`<span class="pill huom">${c.huom} huom</span>`:""}${(()=>{const ev=edellVerdict(m.o);return ev.level==="kesken"?"":`<span class="pill ${ev.level==="ok"?"ok":ev.level==="ei"?"puute":"huom"}">${EV_SHORT[ev.level]}</span>`})()}${m.o.decision?`<span class="pill ok">${DEC[m.o.decision]}</span>`:""}</div></div>
+      <button class="btn" data-open="${m.id}">Avaa</button></div>
+      <div style="display:flex;gap:8px;margin-top:8px"><button class="btn sec" style="flex:1;padding:8px" data-copy="${m.id}">Kopioi hanketiedot uuteen</button>
+      <button class="btn warn" style="padding:8px 12px" data-del="${m.id}">Poista</button></div></div>`});
+  h+=`<button class="btn block" id="newBtn">+ Uusi mallikatselmus</button>
+  <label class="btn sec block filebtn">📦 Tuo hankepaketti uuteen katselmukseen<input type="file" id="pkgNewInput" accept=".json,application/json"></label>
+  <h2>Varmuuskopio</h2><div class="card">
+   <p style="margin-top:0" class="muted">Katselmukset ja kuvat tallentuvat tähän puhelimeen. Ota varmuuskopio säännöllisesti – sillä voit myös siirtää katselmukset toiseen laitteeseen.</p>
+   <button class="btn sec block" id="backupBtn">Vie varmuuskopio (kaikki katselmukset ja kuvat)</button>
+   <label class="btn sec block filebtn">Palauta varmuuskopio<input type="file" id="restoreInput" accept=".json,application/json"></label>
+   <p class="muted" id="bkNote" style="margin-bottom:0">${installHint()}</p></div>`;
+  main.innerHTML=h;
+}
+
+function renderInfo(){
+  let h=`<h2>Perustiedot</h2><div class="card">`;
+  INFO_FIELDS.forEach(([k,l,t])=>{const v=esc(cur.info[k]||"");
+    h+=`<label class="f"><span>${l}</span>${t==="area"?`<textarea data-info="${k}" placeholder="Nimet ja roolit: työnjohtaja, tekijät, valvoja, suunnittelija">${v}</textarea>`:`<input type="${t==="date"?"date":"text"}" data-info="${k}" value="${v}">`}</label>`});
+  h+=`</div><h2>Projektikohtaiset arvot</h2><p class="muted" style="margin:0 4px">Täytä suunnitelmista, työselostuksesta ja tuotteiden asennusohjeista. Arvot näkyvät tarkastuskohdissa <span class="pv">näin</span>, puuttuvat <span class="pv miss">näin</span>.</p><div class="card">`;
+  PARAM_GROUPS.forEach(g=>{h+=`<div class="pg">${g.name}</div>`;g.params.forEach(([k,l,d,hint])=>{
+    h+=`<label class="f"><span>${l}</span><input type="text" data-param="${k}" value="${esc(cur.params[k]||"")}" placeholder="${esc(d||"")}">${hint?`<em>${esc(hint)}</em>`:""}</label>`})});
+  h+=`</div>`;
+  main.innerHTML=h;
+}
+
+function itemHTML(sec,it,custom){
+  const r=cur.items[it.id]||{};
+  return `<div class="item" data-s="${r.s||""}" data-iid="${it.id}">
+   <h3><span class="no">${numOf(cur,sec,it)}</span><span>${esc(it.t)}${it.crit?' <span class="crit">*</span>':""}</span></h3>
+   ${it.req?`<div class="req">${fill(it.req,cur.params)}</div>`:""}
+   ${it.how?`<details class="how"><summary>Miten tarkastetaan</summary><div>${fill(it.how,cur.params)}</div></details>`:""}
+   ${it.ref?`<div class="ref">Viite: ${esc(it.ref)}</div>`:""}
+   <div class="st${sec.labels?" lbl":""}">${Object.keys(ST).map(v=>`<button data-v="${v}" data-item="${it.id}" class="${r.s===v?"on":""}">${stLabel(sec,v)}</button>`).join("")}</div>
+   ${sec.id==="0"?`<label class="rdate">Vastaanotettu <input type="date" data-rdate="${it.id}" value="${esc(r.d||"")}"></label>`:""}
+   <textarea class="note" data-note="${it.id}" placeholder="Huomiot">${esc(r.n||"")}</textarea>
+   ${sec.photo?`<div class="ph"><button type="button" class="add" data-pick="cam" data-item="${it.id}">📷 Kamera</button><button type="button" class="add" data-pick="gal" data-item="${it.id}">🖼 Galleria</button><span class="phbusy" data-phbusy="${it.id}"></span><span data-ph="${it.id}" style="display:contents"></span></div>${webviewNote()}
+   <details class="phalt"><summary>Kuvanappi ei avaudu? Varatapa</summary><input type="file" accept="image/*" multiple data-addph="${it.id}" class="native"></details>`:""}
+   ${custom?`<button class="del-item" data-delitem="${sec.id}|${it.id}">Poista oma tarkastuskohta</button>`:""}
+  </div>`;
+}
+function renderCheck(){
+  let h="";
+  SECTIONS.forEach(sec=>{
+    const items=[...sec.items,...((cur.custom||{})[sec.id]||[])];
+    const done=items.filter(i=>(cur.items[i.id]||{}).s).length;
+    const pu=items.filter(i=>(cur.items[i.id]||{}).s==="puute").length;
+    h+=`<div class="sec ${openSecs.has(sec.id)?"open":""}" data-sec="${sec.id}">
+     <button class="sec-h" data-toggle="${sec.id}"><span class="ltr">${sec.id}</span><b>${esc(sec.title)}</b>
+     <span class="cnt ${done===items.length?"done":""}">${pu?`<span class="pill puute">${pu}</span>`:""}${done}/${items.length}</span><span class="chev">›</span></button>
+     <div class="sec-body"><div class="sec-desc">${esc(sec.desc)}</div>${sec.intro?`<div class="intro"><b>Vaatimus:</b> ${fill(sec.intro,cur.params)}</div>`:""}
+     ${sec.items.map(i=>itemHTML(sec,i,false)).join("")}
+     ${((cur.custom||{})[sec.id]||[]).map(i=>itemHTML(sec,i,true)).join("")}
+     <div class="addform" data-addform="${sec.id}"><b style="font-size:14px">+ Projektikohtainen tarkastuskohta</b>
+      <input type="text" placeholder="Otsikko" data-newt="${sec.id}" style="margin:8px 0">
+      <textarea placeholder="Vaatimus / työohje (tulostuu muistioon)" data-newr="${sec.id}"></textarea>
+      <textarea placeholder="Miten tarkastetaan (ei tulostu)" data-newh="${sec.id}" style="margin-top:6px"></textarea>
+      <button class="btn sec" data-additem="${sec.id}" style="margin-top:8px">Lisää kohta</button></div>
+     ${sec.id==="0"?edellPanel():""}
+     </div></div>`;
+  });
+  main.innerHTML=h;
+  allItems(cur).forEach(([s,i])=>{if(s.photo&&(cur.photos[i.id]||[]).length)renderItemPhotos(i.id)});
+}
+
+function renderSummary(){
+  const c=stats(cur);
+  const ev=edellVerdict(cur);
+  let h=`<h2>Mallikatselmuksen edellytykset</h2><div class="card verdict v-${ev.level}"><b>${EV_TITLE[ev.level]}</b><div style="white-space:pre-line;font-size:14px;margin-top:4px">${esc(ev.text)}</div></div>
+  <h2>Tilanne</h2><div class="card"><div class="sumrow">
+   <span class="pill ok">OK ${c.ok}</span><span class="pill huom">Huom ${c.huom}</span><span class="pill puute">Puute ${c.puute}</span><span class="pill ek">Ei koske ${c.ek}</span></div>
+   <div class="muted">${c.done}/${c.total} kohtaa käsitelty${c.none?` – ${c.none} kohtaa vielä merkitsemättä`:""}.</div></div>`;
+  const open=allItems(cur).filter(([s,i])=>["puute","huom"].includes((cur.items[i.id]||{}).s));
+  if(open.length){h+=`<h2>Puutteet ja huomautukset</h2><div class="card"><ul class="open-list" style="padding-left:18px;margin:0">`+
+    open.map(([s,i])=>{const r=cur.items[i.id];return `<li><span class="pill ${r.s}">${stLabel(s,r.s)}</span><b>${numOf(cur,s,i)}</b> ${esc(i.t)}${r.n?`<div class="muted">${esc(r.n)}</div>`:""}</li>`}).join("")+`</ul></div>`}
+  const miss=[];PARAM_GROUPS.forEach(g=>g.params.forEach(([k,l])=>{if(!(cur.params[k]||"").trim())miss.push(l)}));
+  if(miss.length)h+=`<div class="card" style="background:#fff8ec"><b>Projektiarvoja puuttuu (${miss.length})</b><div class="muted">${miss.map(esc).join(" · ")}</div></div>`;
+  h+=`<h2>Mallityön hyväksyntä</h2><div class="card">
+   <div class="st dec">${Object.keys(DEC).map(k=>`<button data-dec="${k}" class="${cur.decision===k?"on":""}" style="${cur.decision===k?`background:${k==="hyv"?"var(--ok)":k==="kor"?"var(--huom)":"var(--puute)"};color:#fff;border-color:transparent`:""}">${DEC[k]}</button>`).join("")}</div>
+   <label class="f"><span>Korjattavat asiat ja määräaika</span><textarea data-top="korjaukset">${esc(cur.korjaukset||"")}</textarea></label>
+   <label class="f"><span>Jatkotarkastus / seuraava katselmus</span><input type="text" data-top="jatko" value="${esc(cur.jatko||"")}"></label>
+   </div>
+   <h2>Muistio</h2><div class="card">
+   <label class="f" style="display:flex;gap:10px;align-items:center"><input type="checkbox" id="optPhotos" checked style="width:20px;height:20px"><span style="margin:0;color:var(--ink)">Liitä valokuvat muistioon</span></label>
+   <label class="f" style="display:flex;gap:10px;align-items:center"><input type="checkbox" id="optReq" checked style="width:20px;height:20px"><span style="margin:0;color:var(--ink)">Tulosta vaatimukset / työohjeet kohtien alle</span></label>
+   <p class="muted" style="margin-top:0">Muistioon tulevat tarkastuskohdat, tila, huomiot ja kuvat. "Miten tarkastetaan" -ohjeet eivät tulostu.</p>
+   <button class="btn block" id="printBtn">Tulosta / tallenna PDF</button>
+   <p class="muted" style="margin:0 0 6px">Tulostusikkunassa valitse tulostimeksi "Tallenna PDF-muodossa".</p>
+   <button class="btn sec block" id="pdfBtn">Lataa PDF-tiedostona (vaatii verkkoyhteyden)</button>
+   <button class="btn sec block" id="htmlBtn">Lataa tulostettava HTML</button>
+   <p class="muted" id="dlNote"></p></div>`;
+  main.innerHTML=h;
+}
+
+/* ===================== edellytykset ===================== */
+const EV_TITLE={ok:"Edellytykset täyttyvät – mallikatselmus voidaan pitää",ehd:"Mallikatselmus voidaan pitää – asiakirjoja täydennettävä",ei:"Edellytykset eivät täyty – mallikatselmusta ei voida pitää",kesken:"Edellytysten toteaminen kesken"};
+const EV_SHORT={ok:"Edellytykset OK",ehd:"Edellytykset: täydennettävää",ei:"Edellytykset puuttuvat",kesken:""};
+function edellVerdict(o){
+  const sec=SECTIONS[0];const items=[...sec.items,...(((o.custom||{})["0"])||[])];
+  const g={ok:[],huom:[],puute:[],ek:[],none:[]};
+  items.forEach(it=>{const r=(o.items||{})[it.id]||{};g[r.s||"none"].push({it,r})});
+  const nm=x=>`${numOf(o,sec,x.it)} ${x.it.t}${x.r.n?" ("+x.r.n.replace(/\s*\n\s*/g,"; ")+")":""}`;
+  const cm=g.puute.filter(x=>x.it.crit),cp=g.huom.filter(x=>x.it.crit),om=g.puute.filter(x=>!x.it.crit),op=g.huom.filter(x=>!x.it.crit);
+  const dl=o.edell_dl?` viimeistään ${o.edell_dl}`:" ennen mallikatselmusta";
+  let level,L=[];
+  if(cm.length){level="ei";
+    L.push("Mallikatselmuksen edellytykset eivät täyty. Urakoitsija ei ole toimittanut seuraavia välttämättömiä asiakirjoja: "+cm.map(nm).join("; ")+".");
+    L.push("Mallikatselmusta ei voida pitää ennen kuin asiakirjat on toimitettu valvojalle ja todettu suunnitelmien mukaisiksi.");
+  }else if(g.none.length){level="kesken";
+    L.push(`Asiakirjoista on arvioimatta ${g.none.length} kpl (${g.none.map(x=>numOf(o,sec,x.it)).join(", ")}).`);
+  }else if(cp.length||om.length||op.length){level="ehd";
+    L.push(cp.length?"Välttämättömissä asiakirjoissa on puutteita: "+cp.map(nm).join("; ")+". Mallikatselmus voidaan pitää valvojan harkinnan mukaan, jos puutteet eivät estä asennuksen arviointia."
+      :"Välttämättömät asiakirjat (lattiakaivo ja vedeneristysjärjestelmä) on toimitettu, joten mallikatselmus voidaan pitää.");
+  }else{level="ok";
+    L.push("Urakoitsija on toimittanut kaikki ennakkoon pyydetyt asiakirjat, ja ne on todettu suunnitelmien mukaisiksi."+(o.info&&o.info.pvm?` Mallikatselmus voidaan pitää ${fmtDate(o.info.pvm)}.`:" Mallikatselmus voidaan pitää."));
+  }
+  if(level!=="ok"){
+    if(level!=="ehd"&&cp.length)L.push("Puutteelliset välttämättömät asiakirjat: "+cp.map(nm).join("; ")+".");
+    if(om.length)L.push("Puuttuvat asiakirjat: "+om.map(nm).join("; ")+".");
+    if(op.length)L.push("Puutteelliset asiakirjat: "+op.map(nm).join("; ")+".");
+    if(cm.length+cp.length+om.length+op.length)L.push(`Puuttuvat ja puutteelliset asiakirjat on toimitettava valvojalle${dl}.`+(level==="ehd"?" Puutteet kirjataan mallikatselmuksen muistioon.":""));
+    if(level==="ei"&&o.edell_uusi)L.push(`Uusi mallikatselmuksen ajankohta: ${o.edell_uusi}.`);
+  }
+  if(o.edell_lisa&&o.edell_lisa.trim())L.push(o.edell_lisa.trim());
+  return {level,text:L.join("\n"),g};
+}
+function verdictHTML(){const ev=edellVerdict(cur);return `<b>${EV_TITLE[ev.level]}</b><div style="white-space:pre-line;font-size:14px;margin-top:4px">${esc(ev.text)}</div>`}
+function edellPanel(){
+  const ev=edellVerdict(cur);
+  return `<div class="card verdict v-${ev.level}" id="verdict0">${verdictHTML()}</div>
+   <div class="card"><label class="f"><span>Puuttuvien asiakirjojen toimitus viimeistään</span><input type="text" data-top="edell_dl" value="${esc(cur.edell_dl||"")}" placeholder="esim. 5.11.2026"></label>
+   <label class="f"><span>Uusi mallikatselmuksen ajankohta (jos ei voida pitää)</span><input type="text" data-top="edell_uusi" value="${esc(cur.edell_uusi||"")}"></label>
+   <label class="f"><span>Lisäteksti johtopäätökseen</span><textarea data-top="edell_lisa">${esc(cur.edell_lisa||"")}</textarea></label>
+   <button class="btn block" id="edellPrint">Tulosta / tallenna edellytysmuistio PDF:ksi</button>
+   <button class="btn sec block" id="edellPdf">Lataa edellytysmuistio PDF-tiedostona</button>
+   <button class="btn sec block" id="edellHtml">Lataa edellytysmuistio HTML:nä</button>
+   <p class="muted" id="dlNote0">Erillinen muistio urakoitsijalle: vaatimus, asiakirjojen tila ja johtopäätös.</p></div>`;
+}
+function refreshVerdict(){const el=document.getElementById("verdict0");if(!el)return;const ev=edellVerdict(cur);el.className="card verdict v-"+ev.level;el.innerHTML=verdictHTML()}
+async function buildEdellReport(){
+  const o=cur;const sec=SECTIONS[0];const items=[...sec.items,...((o.custom||{})["0"]||[])];const ev=edellVerdict(o);
+  const kv=[["hanke","Hanke / kohde"],["osoite","Osoite"],["tila","Mallitila"],["urakoitsija","Urakoitsija"],["tarkastaja","Valvoja"]];
+  let h=`<div class="rp" style="padding:0 2mm"><h1>Mallikatselmuksen edellytysten toteaminen</h1>
+  <div style="font-size:9pt;color:#444">Märkätilan vedeneristys- ja laatoitustöiden mallikatselmus – urakoitsijan ennakkoon toimitettavat asiakirjat</div>
+  <h2>Perustiedot</h2><table class="kv">`+kv.map(([k,l])=>`<tr><td>${l}</td><td>${esc(o.info[k]||"")}</td></tr>`).join("")+
+  `<tr><td>Suunniteltu mallikatselmus</td><td>${fmtDate(o.info.pvm)}</td></tr><tr><td>Toteamispäivä</td><td>${fmtDate(today())}</td></tr></table>
+  <h2>Vaatimus</h2><div class="req0">${esc(fillPlain(sec.intro,o.params))}</div>
+  <h2>Toimitettavat asiakirjat</h2><table><thead><tr><th class="no">Nro</th><th>Asiakirja</th><th class="tila">Tila</th><th style="width:55mm">Huomiot</th></tr></thead><tbody>`;
+  for(const it of items){const r=o.items[it.id]||{};
+    h+=`<tr><td class="no">${numOf(o,sec,it)}</td><td><b>${esc(it.t)}${it.crit?" *":""}</b><div class="rq">${esc(fillPlain(it.req||"",o.params))}</div></td>
+    <td class="tila ${r.s?"t-"+r.s:"t-x"}">${r.s?stLabel(sec,r.s,true):"Arvioimatta"}</td><td>${r.d?`Vastaanotettu ${fmtDate(r.d)}<br>`:""}${esc(r.n||"").replace(/\n/g,"<br>")}</td></tr>`}
+  h+=`</tbody></table><div style="font-size:8.5pt;margin-top:1mm">* = välttämätön asiakirja; ilman sitä mallikatselmusta ei pidetä.</div>
+  <h2>Johtopäätös</h2><div class="vbox vb-${ev.level}"><b>${EV_TITLE[ev.level]}</b><br>${esc(ev.text).replace(/\n/g,"<br>")}</div>
+  <div class="sign"><div>Valvoja</div><div>Urakoitsija (tiedoksi saanut)</div></div>
+  <div class="foot">Laadittu ${fmtDate(today())}.</div></div>`;
+  return h;
+}
+
+/* ===================== muistio ===================== */
+async function buildReport(withPhotos,withReq){
+  const o=cur;const c=stats(o);
+  let h=`<div class="rp" style="padding:0 2mm"><h1>Mallikatselmusmuistio – märkätila</h1>
+  <div style="font-size:9pt;color:#444">Vedeneristys- ja laatoitustöiden mallityön tarkastus</div>
+  <h2>Perustiedot</h2><table class="kv">`+
+  INFO_FIELDS.map(([k,l,t])=>`<tr><td>${l}</td><td>${t==="date"?fmtDate(o.info[k]):esc(o.info[k]||"").replace(/\n/g,"<br>")}</td></tr>`).join("")+`</table>
+  <h2>Projektikohtaiset tiedot</h2><table class="kv">`;
+  PARAM_GROUPS.forEach(g=>g.params.forEach(([k,l])=>{if((o.params[k]||"").trim())h+=`<tr><td>${esc(l)}</td><td>${esc(o.params[k])}</td></tr>`}));
+  h+=`</table>`;
+  if((o.docs||[]).length)h+=`<h2>Lähtöaineisto</h2><table class="kv">`+o.docs.map(d=>`<tr><td>${esc(d.name)}</td><td>${esc(d.info||"")}</td></tr>`).join("")+`</table>`;
+  if((o.products||[]).length)h+=`<h2>Käytettävät tuotteet</h2><table class="kv">`+o.products.filter(id=>PRODUCTS[id]).map(id=>`<tr><td>${esc(PRODUCTS[id].name)}</td><td style="font-size:8.5pt">${esc(PRODUCTS[id].data.slice(0,3).join(" "))}</td></tr>`).join("")+`</table>`;
+  if((o.notes||[]).length)h+=`<h2>Aineistosta havaitut huomiot</h2><table class="kv">`+o.notes.map((n,i)=>`<tr><td>${i+1}</td><td>${esc(n)}</td></tr>`).join("")+`</table>`;
+  for(const sec of SECTIONS){
+    const items=[...sec.items,...((o.custom||{})[sec.id]||[])];
+    h+=`<h2>${sec.id}. ${esc(sec.title)}</h2><table><thead><tr><th class="no">Nro</th><th>Tarkastuskohta</th><th class="tila">Tila</th><th style="width:62mm">Huomiot</th></tr></thead><tbody>`;
+    for(const it of items){const r=o.items[it.id]||{};
+      let ims="";if(withPhotos&&sec.photo){for(const pid of (o.photos[it.id]||[])){const d=await photoData(pid);if(d)ims+=`<img src="${d}">`}}
+      h+=`<tr><td class="no">${numOf(o,sec,it)}</td><td><b>${esc(it.t)}</b>${withReq&&it.req?`<div class="rq">${esc(fillPlain(it.req,o.params))}</div>`:""}${ims?`<div class="ims">${ims}</div>`:""}</td>
+      <td class="tila ${r.s?"t-"+r.s:"t-x"}">${r.s?stLabel(sec,r.s,true):"–"}</td><td>${r.d?`Vastaanotettu ${fmtDate(r.d)}<br>`:""}${esc(r.n||"").replace(/\n/g,"<br>")}</td></tr>`}
+    h+=`</tbody></table>`;
+    if(sec.id==="0"){const ev=edellVerdict(o);h+=`<div class="vbox vb-${ev.level}"><b>${EV_TITLE[ev.level]}</b><br>${esc(ev.text).replace(/\n/g,"<br>")}</div>`}
+  }
+  h+=`<h2>Yhteenveto</h2><table class="kv">
+   <tr><td>Tarkastetut kohdat</td><td>OK ${c.ok} · Huomautus ${c.huom} · Puute ${c.puute} · Ei koske ${c.ek}${c.none?` · Merkitsemättä ${c.none}`:""}</td></tr>
+   <tr><td>Mallityön hyväksyntä</td><td><b>${o.decision?DEC[o.decision]:"–"}</b></td></tr>
+   <tr><td>Korjattavat asiat ja määräaika</td><td>${esc(o.korjaukset||"").replace(/\n/g,"<br>")}</td></tr>
+   <tr><td>Jatkotarkastus</td><td>${esc(o.jatko||"")}</td></tr></table>
+   <p style="font-size:9pt">Hyväksytty mallityö toimii laadun vertailukohteena seuraaville märkätiloille.</p>
+   <div class="sign"><div>Urakoitsija / työnjohto</div><div>Vedeneristäjä</div><div>Valvoja</div></div>
+   <div class="foot">Laadittu ${fmtDate(today())}. Tarkastuslistan perusta: YM asetus 782/2017, RT 103811, RT 84-11166, RT 14-10984, Ratu F61-0321 sekä projektin suunnitelmat ja valmistajien ohjeet.</div></div>`;
+  return h;
+}
+function fileBase(kind){return ((kind==="edell"?"Mallikatselmuksen edellytykset ":"Mallikatselmus ")+nameOf(cur)+" "+(cur.info.pvm||today())).replace(/[\\/:*?"<>|]+/g,"").slice(0,120)}
+function loadScript(src){return new Promise((res,rej)=>{if(window.html2pdf)return res();const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s)})}
+async function downloadsNS(){try{return window.claude&&claude.use?await claude.use("downloads"):null}catch(e){return null}}
+async function saveFile(name,data){
+  const dl=await downloadsNS();
+  if(dl){try{await dl.save({filename:name,data});return true}catch(e){if(e&&e.code==="declined")return false}}
+  try{const url=URL.createObjectURL(data instanceof Blob?data:new Blob([data]));const a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000);return true}catch(e){return false}
+}
+function optChk(id){const e=document.getElementById(id);return e?e.checked:true}
+function reportBody(kind){return kind==="edell"?buildEdellReport():buildReport(optChk("optPhotos"),optChk("optReq"))}
+function noteEl(kind){return document.getElementById(kind==="edell"?"dlNote0":"dlNote")||{set textContent(v){toast(v)}}}
+async function doPdf(kind){
+  const note=noteEl(kind);note.textContent="Muodostetaan PDF…";
+  try{
+    await loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js");
+    const rep=document.getElementById("report");
+    rep.innerHTML=await reportBody(kind);
+    const blob=await html2pdf().set({margin:[10,10,12,10],image:{type:"jpeg",quality:0.9},html2canvas:{scale:2,useCORS:true,backgroundColor:"#fff"},
+      jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},pagebreak:{mode:["css","legacy"],avoid:["tr",".sign"]}}).from(rep.firstElementChild).outputPdf("blob");
+    rep.innerHTML="";
+    const ok=await saveFile(fileBase(kind)+".pdf",blob);
+    note.textContent=ok?"PDF valmis.":"Lataus peruttiin.";
+  }catch(e){note.textContent="PDF:n muodostus epäonnistui. Kokeile tulostettavaa HTML-tiedostoa."}
+}
+async function reportHTMLDoc(kind){
+  const css=[...document.querySelectorAll("style")].map(s=>s.textContent).join("\n").split("\n").filter(l=>l.trim().startsWith(".rp")).join("\n");
+  const body=await reportBody(kind);
+  return `<!DOCTYPE html><html lang="fi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(fileBase(kind))}</title>
+  <style>${css}\nhtml,body{background:#fff;margin:0}.rp{max-width:186mm;margin:10mm auto;color:#000;font:10pt/1.35 Arial,Helvetica,sans-serif}@page{size:A4;margin:12mm}@media print{.rp{margin:0}}</style></head>
+  <body>${body}<script>window.addEventListener("load",function(){setTimeout(function(){try{window.print()}catch(e){}},400)})<\/script></body></html>`;
+}
+async function doHtml(kind){const note=noteEl(kind);note.textContent="Muodostetaan…";
+  const doc=await reportHTMLDoc(kind);const ok=await saveFile(fileBase(kind)+".html",new Blob([doc],{type:"text/html"}));
+  note.textContent=ok?"Avaa tiedosto selaimessa – tulostusikkuna aukeaa automaattisesti.":"Lataus peruttiin."}
+async function doPrint(kind){
+  const rep=document.getElementById("report");rep.innerHTML=await reportBody(kind);
+  await Promise.all([...rep.querySelectorAll("img")].map(i=>i.decode?i.decode().catch(()=>{}):null));
+  const old=document.title;document.title=fileBase(kind);
+  const done=()=>{rep.innerHTML="";document.title=old;window.removeEventListener("afterprint",done)};
+  window.addEventListener("afterprint",done);
+  try{window.print()}catch(e){noteEl(kind).textContent="Tulostus ei onnistunut tässä näkymässä – lataa PDF tai HTML."}
+  setTimeout(()=>{if(rep.innerHTML&&!matchMedia("print").matches)done()},60000);
+}
+
+/* ===================== tapahtumat ===================== */
+document.getElementById("homeBtn").onclick=()=>{view="home";render();window.scrollTo(0,0)};
+document.getElementById("tabs").onclick=e=>{const b=e.target.closest("button[data-t]");if(!b)return;tab=b.dataset.t;render();window.scrollTo(0,0)};
+document.getElementById("bigimg").onclick=e=>e.currentTarget.classList.remove("on");
+
+function openModal(html){document.getElementById("modalBox").innerHTML=html;document.getElementById("modal").classList.add("on")}
+function closeModal(){const m=document.getElementById("modal");m.classList.remove("on");m.classList.remove("full")}
+document.getElementById("modal").onclick=e=>{if(e.target.id==="modal"&&!e.currentTarget.classList.contains("full"))closeModal()};
+
+document.addEventListener("click",async e=>{
+  const t=e.target;
+  if(t.closest("[data-copylink]")){try{await navigator.clipboard.writeText(APP_URL);toast("Linkki kopioitu – liitä se Chromen osoiteriville")}catch(e){toast("Kopiointi ei onnistunut – kirjoita osoite Chromeen")}return}
+  const pk=t.closest("[data-pick]");if(pk){const id=pk.dataset.item;pickImages(pk.dataset.pick,fs=>addPhotos(id,fs));return}
+  const tp=t.closest("[data-testpick]");if(tp){pickImages(tp.dataset.testpick,fs=>toast("Testi OK: "+fs.length+" kuva(a) saatiin"));return}
+  if(t.id==="runFill"){if(setupFiles.length)runFill();return}
+  if(t.id==="stopFill"){if(setupState&&setupState.ctl)setupState.ctl.abort();setupState=null;renderAineisto();return}
+  if(t.id==="skipSetup"){tab="tiedot";render();return}
+  const rf=t.closest("[data-rmfile]");if(rf){setupFiles.splice(+rf.dataset.rmfile,1);renderAineisto();return}
+  const rp=t.closest("[data-rmprod]");if(rp){e.preventDefault();removeProduct(rp.dataset.rmprod);save();renderAineisto();return}
+  const ap=t.closest("[data-addprod]");if(ap){const f=applyProducts([ap.dataset.addprod]);save();renderAineisto();toast(PRODUCTS[ap.dataset.addprod].name+" lisätty"+(f.length?` – ${f.length} kenttää täytetty`:""));return}
+  if(t.id==="rvApply"){applyReview();return}
+  if(t.id==="rvCancel"||t.id==="rvClose"){pendingFill=null;closeModal();renderAineisto();return}
+  if(t.id==="newBtn"){cur=newInspection();save();rebuildIndex();setupFiles=[];setupState=null;view="insp";tab="aineisto";render();return}
+  const op=t.closest("[data-open]");if(op){cur=LS.get("mk_"+op.dataset.open);if(cur){cur.photos=cur.photos||{};cur.custom=cur.custom||{};cur.docs=cur.docs||[];cur.products=cur.products||[];cur.notes=cur.notes||[];setupFiles=[];setupState=null;view="insp";tab="tarkastus";render();syncPhotos(cur);window.scrollTo(0,0)}return}
+  const cp=t.closest("[data-copy]");if(cp){const src=LS.get("mk_"+cp.dataset.copy);cur=newInspection(src);save();rebuildIndex();setupFiles=[];setupState=null;view="insp";tab="tiedot";render();toast("Hanketiedot ja projektiarvot kopioitu");return}
+  const dl=t.closest("[data-del]");if(dl){const id=dl.dataset.del;const o=LS.get("mk_"+id);
+    openModal(`<b>Poistetaanko katselmus?</b><p>${esc(nameOf(o||{info:{}}))}<br><span class="muted">Myös kuvat poistetaan. Toimintoa ei voi perua.</span></p>
+    <div style="display:flex;gap:8px"><button class="btn sec" style="flex:1" id="mCancel">Peruuta</button><button class="btn warn" style="flex:1" id="mDel" data-id="${id}">Poista</button></div>`);return}
+  if(t.id==="mCancel"){closeModal();return}
+  if(t.id==="mDel"){const id=t.dataset.id;const o=LS.get("mk_"+id);
+    if(o){for(const k in (o.photos||{}))for(const p of o.photos[k]){idbDel(p);if(db&&me)db.doc(inspPath(id)).collection("photos").doc(p).delete().catch(()=>{})}}
+    LS.del("mk_"+id);LS.set("mk_index",(LS.get("mk_index")||[]).filter(x=>x.id!==id));
+    if(db&&me)db.doc(inspPath(id)).delete().catch(()=>{});
+    closeModal();render();toast("Katselmus poistettu");return}
+  const tg=t.closest("[data-toggle]");if(tg){const id=tg.dataset.toggle;openSecs.has(id)?openSecs.delete(id):openSecs.add(id);tg.parentElement.classList.toggle("open");return}
+  const sb=t.closest(".st button[data-item]");if(sb){const id=sb.dataset.item,v=sb.dataset.v;const r=cur.items[id]=cur.items[id]||{};
+    r.s=r.s===v?"":v;save();const card=sb.closest(".item");card.dataset.s=r.s;card.querySelectorAll(".st button").forEach(b=>b.classList.toggle("on",b.dataset.v===r.s));
+    const secEl=sb.closest(".sec");if(secEl){const sid=secEl.dataset.sec;const sec=SECTIONS.find(s=>s.id===sid);const items=[...sec.items,...((cur.custom||{})[sid]||[])];
+      const done=items.filter(i=>(cur.items[i.id]||{}).s).length,pu=items.filter(i=>(cur.items[i.id]||{}).s==="puute").length;
+      const cnt=secEl.querySelector(".cnt");cnt.className="cnt"+(done===items.length?" done":"");cnt.innerHTML=(pu?`<span class="pill puute">${pu}</span>`:"")+`${done}/${items.length}`}
+    if(r.s==="puute"||r.s==="huom"){const ta=card.querySelector(".note");if(ta&&!ta.value)ta.focus()}
+    refreshVerdict();
+    return}
+  const dp=t.closest("[data-dec]");if(dp){cur.decision=cur.decision===dp.dataset.dec?"":dp.dataset.dec;save();renderSummary();return}
+  const big=t.closest("[data-big]");if(big){const bi=document.getElementById("bigimg");bi.querySelector("img").src=big.src;bi.classList.add("on");return}
+  const dph=t.closest("[data-delph]");if(dph){delPhoto(dph.dataset.item,dph.dataset.delph);return}
+  const ai=t.closest("[data-additem]");if(ai){const sid=ai.dataset.additem;const tt=document.querySelector(`[data-newt="${sid}"]`).value.trim();
+    if(!tt){toast("Anna otsikko");return}
+    const list=cur.custom[sid]=cur.custom[sid]||[];const n=SECTIONS.find(s=>s.id===sid).items.length+list.length+1;
+    list.push({id:sid+n+"p",t:tt,req:document.querySelector(`[data-newr="${sid}"]`).value.trim(),how:document.querySelector(`[data-newh="${sid}"]`).value.trim(),ref:"Projektikohtainen"});
+    save();renderCheck();toast("Tarkastuskohta lisätty");return}
+  const di=t.closest("[data-delitem]");if(di){const [sid,iid]=di.dataset.delitem.split("|");cur.custom[sid]=(cur.custom[sid]||[]).filter(i=>i.id!==iid);delete cur.items[iid];
+    for(const p of (cur.photos[iid]||[]))idbDel(p);delete cur.photos[iid];save();renderCheck();return}
+  if(t.id==="pdfBtn"){doPdf();return}
+  if(t.id==="edellPdf"){doPdf("edell");return}
+  if(t.id==="edellHtml"){doHtml("edell");return}
+  if(t.id==="htmlBtn"){doHtml();return}
+  if(t.id==="printBtn"){doPrint();return}
+  if(t.id==="edellPrint"){doPrint("edell");return}
+  if(t.id==="backupBtn"){doBackup();return}
+});
+document.addEventListener("input",e=>{const t=e.target;if(!cur)return;
+  if(t.dataset.info){cur.info[t.dataset.info]=t.value;save();if(["hanke","tila","pvm"].includes(t.dataset.info))document.getElementById("hdrTitle").innerHTML=esc(nameOf(cur))+`<small>${fmtDate(cur.info.pvm)||""}</small>`;return}
+  if(t.dataset.param){cur.params[t.dataset.param]=t.value;save();return}
+  if(t.dataset.note){(cur.items[t.dataset.note]=cur.items[t.dataset.note]||{}).n=t.value;save();refreshVerdict();return}
+  if(t.dataset.rdate){(cur.items[t.dataset.rdate]=cur.items[t.dataset.rdate]||{}).d=t.value;save();return}
+  if(t.dataset.top){cur[t.dataset.top]=t.value;save();refreshVerdict();return}
+});
+function onFilePicked(e){const t=e.target;if(!t||t.type!=="file"||t.dataset.dyn)return;
+  if((t.id==="pkgInput"||t.id==="pkgNewInput")&&t.files&&t.files[0]){const f=t.files[0];t.value="";importPackage(f,t.id==="pkgNewInput");return}
+  if(t.id==="restoreInput"&&t.files&&t.files[0]){const f=t.files[0];t.value="";doRestore(f);return}diag("change (sivun kenttä): "+(t.files?t.files.length:0)+" tiedosto(a)");if(t.id==="testNative"){toast("Testi OK: "+t.files.length+" kuva(a) saatiin");t.value="";return}if(t.id==="setupInput"&&t.files&&t.files.length){setupFiles.push(...t.files);t.value="";setupState=null;renderAineisto();return}if(t.dataset.addph&&t.files&&t.files.length){const fs=[...t.files];t.value="";addPhotos(t.dataset.addph,fs)}}
+document.addEventListener("change",onFilePicked);
+
+/* ===================== käynnistys ===================== */
+(async function(){
+  await idbOpen();
+  rebuildIndex();render();
+  setSync("off");
+  try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
+  if("serviceWorker" in navigator&&location.protocol.startsWith("http")){navigator.serviceWorker.register("sw.js").catch(()=>{})}
+})();
+</script>
+</body>
+</html>
